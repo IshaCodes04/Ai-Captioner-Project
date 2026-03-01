@@ -70,10 +70,10 @@ const App = () => {
 
   return (
     <Routes>
-      {/* Default route - redirect to home if logged in, otherwise to login */}
+      {/* Default route - redirect to home if logged in, otherwise to signup */}
       <Route
         path="/"
-        element={user ? <Navigate to="/home" replace /> : <Navigate to="/login" replace />}
+        element={user ? <Navigate to="/home" replace /> : <Navigate to="/signup" replace />}
       />
 
       {/* Login route */}
