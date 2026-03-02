@@ -19,15 +19,12 @@ async function generateCaptions(base64ImageFile) {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: contents,
-      config:{
-        systemInstruction: `
+      systemInstruction: `
         you are an expert in generating captions for images.
         you generate single caption for the image.
         your caption should be short and concise
         you used hashtags and emojis in the caption
         `
-
-      }
     });
 
     return response.text;
