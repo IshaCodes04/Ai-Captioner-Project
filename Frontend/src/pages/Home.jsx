@@ -1,117 +1,171 @@
-import React from "react";
-import { ArrowRight, Zap, Sparkles, Wand2, Shield, Globe, Layers, Users } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, Sparkles, Zap, Upload, Image, Copy, Wand2, Globe, Shield, CheckCircle2, Star, Play, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+
+/* ── Brand tokens ─────────────────────────────── */
+const T = {
+  bg: "#fafafa",
+  surface: "#f5f0eb",
+  dark: "#1a1a1a",
+  mid: "#4a4a4a",
+  muted: "#9a9a9a",
+  accent: "#c4956a",
+  accentHover: "#b5845a",
+  border: "#e8e0d5",
+};
+
+const Btn = ({ children, onClick, variant = "primary", className = "" }) => {
+  const base = "inline-flex items-center justify-center gap-2.5 font-bold transition-all active:scale-95 cursor-pointer";
+  const variants = {
+    primary: `bg-[${T.dark}] text-white hover:bg-[${T.accent}] px-7 py-3.5 rounded-xl shadow-md`,
+    accent: `bg-[${T.accent}] text-white hover:bg-[${T.accentHover}] px-7 py-3.5 rounded-xl shadow-lg`,
+    outline: `border-2 border-[${T.border}] text-[${T.mid}] hover:border-[${T.accent}] hover:text-[${T.accent}] px-7 py-3.5 rounded-xl`,
+    ghost: `text-[${T.mid}] hover:text-[${T.dark}] px-4 py-2`,
+  };
+  return <button onClick={onClick} className={`${base} ${variants[variant]} ${className}`}>{children}</button>;
+};
 
 const Home = () => {
   const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#020617] font-['Inter'] selection:bg-[#14f1d9]/30 text-white overflow-x-hidden">
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/5 bg-[#020617]/50">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center text-sm font-bold uppercase tracking-wider">
-          <div className="flex items-center gap-2 group cursor-pointer transition-all hover:scale-105">
-            <div className="w-10 h-10 bg-[#14f1d9] rounded-xl flex items-center justify-center text-[#020617] shadow-lg shadow-[#14f1d9]/20">
-              <Zap className="w-6 h-6 fill-current" />
+    <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden" style={{ background: T.bg, fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ══ NAVBAR ══════════════════════════════════════════════ */}
+      <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-sm border-b border-[#e8e0d5]" : ""}`}>
+        <div className="max-w-7xl mx-auto px-8 h-20 flex justify-between items-center">
+          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate("/home")}>
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style={{ background: T.dark }}>
+              <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
             </div>
-            <span className="text-xl font-black text-white tracking-tighter">AI Captioner</span>
+            <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>Caption<span style={{ color: T.accent }}>AI</span></span>
           </div>
 
-          <div className="hidden md:flex items-center gap-10 text-slate-400">
-            <a href="#features" className="hover:text-[#14f1d9] transition-colors">Features</a>
-            <a href="#steps" className="hover:text-[#14f1d9] transition-colors">How it works</a>
-            <a href="#about" className="hover:text-[#14f1d9] transition-colors">About</a>
+          <div className="hidden md:flex items-center gap-9">
+            {[["Features", "#features"], ["How It Works", "#how"], ["Pricing", "#pricing"]].map(([l, h]) => (
+              <a key={l} href={h} className="text-sm font-semibold transition-colors" style={{ color: T.mid }} onMouseEnter={e => e.target.style.color = T.accent} onMouseLeave={e => e.target.style.color = T.mid}>{l}</a>
+            ))}
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/login")}
-              className="px-6 py-2.5 rounded-full text-white hover:text-[#14f1d9] transition-all"
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => navigate("/signup")}
-              className="px-6 py-2.5 bg-white text-[#020617] rounded-full hover:bg-[#14f1d9] transition-all shadow-xl shadow-white/5 active:scale-95"
-            >
-              Get Started
+            <button onClick={() => navigate("/login")} className="text-sm font-semibold transition-colors" style={{ color: T.mid }} onMouseEnter={e => e.target.style.color = T.dark} onMouseLeave={e => e.target.style.color = T.mid}>Sign In</button>
+            <button onClick={() => navigate("/signup")} className="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm text-white shadow-lg transition-all hover:shadow-xl active:scale-95" style={{ background: T.dark }} onMouseEnter={e => e.currentTarget.style.background = T.accent} onMouseLeave={e => e.currentTarget.style.background = T.dark}>
+              Get Started <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative pt-48 pb-32 px-6">
-        {/* Glow Effects */}
-        <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-[#14f1d9]/10 rounded-full blur-[140px] pointer-events-none animate-pulse"></div>
-        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+      {/* ══ HERO ════════════════════════════════════════════════ */}
+      <section className="relative pt-44 pb-32 px-8 overflow-hidden">
+        {/* Warm glow bg */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[700px] pointer-events-none" style={{ background: `radial-gradient(ellipse at center, rgba(196,149,106,0.12) 0%, transparent 70%)` }}></div>
 
-        <div className="max-w-7xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-[#14f1d9] text-xs font-black uppercase tracking-[0.2em] mb-8 animate-fadeIn">
-            <Sparkles className="w-4 h-4 fill-current" />
-            Empowering 10k+ Creators with AI
-          </div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
 
-          <h1 className="text-7xl md:text-[92px] font-[900] leading-[0.95] tracking-[-0.04em] mb-10 animate-slideUp">
-            The Future of <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14f1d9] via-cyan-400 to-emerald-400">
-              Visual Storytelling
-            </span>
-          </h1>
-
-          <p className="max-w-2xl mx-auto text-slate-400 text-xl font-medium leading-relaxed mb-12 animate-fadeIn opacity-80">
-            Transform your images into viral narratives instantly. AI Captioner understands the context, soul, and vibes of your visuals better than ever before.
-          </p>
-
-          <div className="flex flex-col md:flex-row items-center justify-center gap-6 animate-slideUp">
-            <button
-              onClick={() => navigate("/signup")}
-              className="group relative px-10 py-5 bg-[#14f1d9] text-[#020617] font-black text-xl rounded-2xl shadow-2xl shadow-[#14f1d9]/20 hover:scale-[1.05] active:scale-95 transition-all overflow-hidden"
-            >
-              <div className="absolute inset-x-0 bottom-0 h-1 bg-black/10 group-hover:h-full transition-all"></div>
-              <div className="relative flex items-center gap-3">
-                Start Creating Free
-                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+            {/* Text */}
+            <div className="animate-fadeUp">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-8 text-xs font-black uppercase tracking-widest" style={{ background: `rgba(196,149,106,0.12)`, color: T.accent, border: `1px solid rgba(196,149,106,0.25)` }}>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: T.accent }}></div>
+                Powered by Google Gemini Vision AI
               </div>
-            </button>
 
-            <button className="px-10 py-5 border border-slate-800 rounded-2xl font-black text-xl text-slate-300 hover:bg-white hover:text-[#020617] transition-all">
-              Watch Demo
-            </button>
-          </div>
+              <h1 className="text-[76px] font-black leading-[0.9] tracking-[-0.04em] mb-8" style={{ color: T.dark }}>
+                Turn Any Image<br />Into a <span style={{ color: T.accent }}>Viral Caption</span>
+              </h1>
 
-          {/* Social Proof Dashboard Mockup */}
-          <div className="mt-24 relative max-w-5xl mx-auto rounded-[40px] border border-white/10 bg-slate-900/50 p-4 backdrop-blur-3xl group shadow-2xl hover:border-slate-700 transition-all duration-700">
-            <div className="rounded-[30px] overflow-hidden border border-white/5 bg-[#020617]">
-              <div className="h-10 bg-slate-900/80 flex items-center gap-2 px-6 border-b border-white/5">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-                </div>
+              <p className="text-xl font-medium leading-relaxed mb-12 max-w-lg" style={{ color: T.mid }}>
+                Upload your photo. Our AI reads the scene, mood, colors, and context — then crafts captions that stop the scroll. In seconds.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-5">
+                <button onClick={() => navigate("/signup")} className="group flex items-center gap-3 px-8 py-5 rounded-2xl font-black text-lg text-white shadow-xl transition-all hover:scale-[1.03] active:scale-95" style={{ background: T.dark }} onMouseEnter={e => e.currentTarget.style.background = T.accent} onMouseLeave={e => e.currentTarget.style.background = T.dark}>
+                  <Upload className="w-5 h-5" /> Start Captioning Free <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button className="flex items-center gap-3 px-7 py-5 rounded-2xl font-bold text-base border-2 transition-all" style={{ border: `2px solid ${T.border}`, color: T.mid }} onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; }} onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.mid; }}>
+                  <div className="w-8 h-8 rounded-full border flex items-center justify-center" style={{ borderColor: T.border }}>
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                  </div>
+                  See Demo
+                </button>
               </div>
-              <div className="p-10 font-black text-4xl text-slate-800 flex items-center justify-center min-h-[400px] uppercase italic tracking-tighter opacity-20">
-                Interactive Tool Preview
+
+              {/* Stats */}
+              <div className="mt-16 flex flex-wrap gap-12" style={{ borderTop: `1px solid ${T.border}`, paddingTop: "24px" }}>
+                {[["12K+", "Creators"], ["99.2%", "Accuracy"], ["0.3s", "Speed"], ["40+", "Languages"]].map(([val, label]) => (
+                  <div key={label}>
+                    <p className="text-2xl font-black" style={{ color: T.accent }}>{val}</p>
+                    <p className="text-xs font-bold uppercase tracking-widest mt-0.5" style={{ color: T.muted }}>{label}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Floating UI elements */}
-            <div className="absolute top-20 -right-20 p-6 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl animate-float">
-              <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-purple-400" />
-              </div>
-              <div className="w-32 h-2 bg-slate-800 rounded-full mb-2"></div>
-              <div className="w-20 h-2 bg-slate-800/50 rounded-full"></div>
-            </div>
-
-            <div className="absolute -bottom-10 -left-10 p-6 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl animate-float" style={{ animationDelay: '1s' }}>
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-[#14f1d9] rounded-full flex items-center justify-center text-[#020617]">
-                  <Zap className="w-5 h-5 fill-current" />
+            {/* Product mockup card */}
+            <div className="relative animate-float hidden lg:block">
+              <div className="rounded-[40px] overflow-hidden shadow-2xl border" style={{ background: "white", borderColor: T.border }}>
+                {/* Chrome bar */}
+                <div className="h-11 flex items-center gap-2 px-6 border-b" style={{ background: T.surface, borderColor: T.border }}>
+                  <div className="flex gap-1.5">
+                    {["#f87171", "#fbbf24", "#34d399"].map(c => <div key={c} className="w-3 h-3 rounded-full" style={{ background: c + "80" }}></div>)}
+                  </div>
+                  <div className="mx-auto h-4 w-56 rounded-md" style={{ background: T.border }}></div>
                 </div>
-                <div>
-                  <div className="w-24 h-2 bg-slate-800 rounded-full mb-1"></div>
-                  <div className="w-16 h-1.5 bg-[#14f1d9]/30 rounded-full"></div>
+
+                <div className="p-10">
+                  <div className="grid grid-cols-2 gap-6 items-start">
+                    {/* Upload */}
+                    <div className="rounded-2xl border-2 border-dashed p-8 flex flex-col items-center gap-4 cursor-pointer" style={{ borderColor: T.border, background: T.surface }}>
+                      <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
+                        <Image className="w-7 h-7" style={{ color: T.accent }} />
+                      </div>
+                      <p className="font-black text-sm text-center" style={{ color: T.dark }}>Drop your image here</p>
+                      <div className="px-4 py-2 rounded-xl text-white text-xs font-bold" style={{ background: T.dark }}>Browse Files</div>
+                    </div>
+
+                    {/* Caption output */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" style={{ color: T.accent }} />
+                        <span className="font-black text-sm" style={{ color: T.dark }}>AI Caption</span>
+                        <div className="ml-auto flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-full" style={{ background: "rgba(52,211,153,0.12)", color: "#10b981", border: "1px solid rgba(52,211,153,0.25)" }}>
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div> LIVE
+                        </div>
+                      </div>
+                      <div className="rounded-2xl p-4 text-sm leading-relaxed italic font-medium" style={{ background: T.surface, color: T.mid }}>
+                        "Golden hour hits different 🌅 Breathe it in. #GoldenHour #VibeCheck"
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {["Casual", "Pro", "Funny"].map(s => (
+                          <div key={s} className="px-3 py-1 rounded-lg text-[11px] font-bold border" style={{ borderColor: T.border, color: T.mid }}>{s}</div>
+                        ))}
+                      </div>
+                      <div className="w-full py-3 rounded-xl text-white font-black text-sm flex items-center justify-center gap-2" style={{ background: T.accent }}>
+                        <Copy className="w-4 h-4" /> Copy Caption
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Floating badge */}
+              <div className="absolute -top-6 -right-6 bg-white rounded-2xl px-5 py-4 shadow-2xl border" style={{ borderColor: T.border }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
+                    <Zap className="w-5 h-5" style={{ color: T.accent }} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-widest" style={{ color: T.muted }}>Generated in</p>
+                    <p className="text-base font-black" style={{ color: T.dark }}>0.28s ⚡</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -119,146 +173,122 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section id="features" className="py-32 px-6 bg-[#020617]">
+      {/* ══ FEATURES ════════════════════════════════════════════ */}
+      <section id="features" className="py-32 px-8 border-t" style={{ borderColor: T.border }}>
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-24">
-            <h2 className="text-5xl font-black mb-6 tracking-tight uppercase italic">Everything You Need</h2>
-            <p className="text-slate-400 text-lg font-medium">Built with the world's most advanced AI models for professional results.</p>
+          <div className="text-center mb-20">
+            <p className="text-xs font-black uppercase tracking-[0.3em] mb-5" style={{ color: T.accent }}>Why CaptionAI?</p>
+            <h2 className="text-5xl font-black tracking-tight mb-6" style={{ color: T.dark }}>
+              Everything creators need,<br /><span style={{ color: T.accent }}>nothing they don't</span>
+            </h2>
+            <p className="text-xl font-medium max-w-xl mx-auto leading-relaxed" style={{ color: T.mid }}>
+              Built with enterprise-grade AI models — now available to every creator on the planet.
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
-              <div className="w-16 h-16 bg-[#14f1d9]/10 rounded-2xl flex items-center justify-center text-[#14f1d9] mb-8 group-hover:scale-110 transition-transform">
-                <Wand2 className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4">Neural Analysis</h3>
-              <p className="text-slate-400 leading-relaxed">Deep learning models that recognize over 50k unique objects and scenes instantly.</p>
-            </div>
-
-            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
-              <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 mb-8 group-hover:scale-110 transition-transform">
-                <Globe className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4">Multi-Lingual</h3>
-              <p className="text-slate-400 leading-relaxed">Generate perfect captions in 40+ languages including Hindi, Spanish, and French.</p>
-            </div>
-
-            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
-              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 mb-8 group-hover:scale-110 transition-transform">
-                <Layers className="w-8 h-8" />
-              </div>
-              <h3 className="text-2xl font-black mb-4">Unlimited Styles</h3>
-              <p className="text-slate-400 leading-relaxed">From sarcastic and funny to professional and poetic - we've got you covered.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing / Stats */}
-      <section className="py-32 px-6 bg-slate-900/10">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
-            <div>
-              <h2 className="text-6xl font-black tracking-tight uppercase italic mb-8">Ready to <br /><span className="text-[#14f1d9]">Level Up?</span></h2>
-              <p className="text-slate-400 text-xl font-medium leading-relaxed mb-10">
-                Start for free and upgrade as you grow. No hidden fees, just pure AI power at your fingertips.
-              </p>
-
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
-                  <span className="text-lg font-bold text-slate-300">100 Free Captions / Month</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
-                  <span className="text-lg font-bold text-slate-300">Advanced Scene Recognition</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
-                  <span className="text-lg font-bold text-slate-300">Save to Cloud History</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#14f1d9]/20 to-purple-500/20 blur-[100px] opacity-50 group-hover:opacity-100 transition-opacity"></div>
-              <div className="relative p-12 rounded-[48px] bg-slate-900 border border-white/10 shadow-2xl">
-                <div className="flex justify-between items-start mb-10">
-                  <div>
-                    <h4 className="text-2xl font-black mb-2">PRO PLAN</h4>
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Power User Tier</p>
+            {[
+              { icon: <Wand2 />, num: "01", title: "Neural Vision Analysis", desc: "Google Gemini Vision reads every pixel — objects, expressions, lighting — and extracts complete scene meaning from your image." },
+              { icon: <Sparkles />, num: "02", title: "Style-Tuned Generation", desc: "Choose from Casual, Funny, Professional, Poetic, or Hashtag-optimized modes. Your brand voice, always on point." },
+              { icon: <Globe />, num: "03", title: "40+ Languages", desc: "Generate native-quality captions in Hindi, Spanish, French, and 37+ more languages with full cultural nuance." },
+              { icon: <Shield />, num: "04", title: "Private & Secure", desc: "Your images are processed securely and never stored permanently. Complete data privacy, guaranteed." },
+              { icon: <Zap />, num: "05", title: "Under 1 Second", desc: "Caption generation completes in under 0.3 seconds on average, powered by optimized cloud inference." },
+              { icon: <Copy />, num: "06", title: "One-Click Copy", desc: "Instantly copy your caption to clipboard. Paste directly into Instagram, Twitter, or any platform." }
+            ].map((f, i) => (
+              <div key={i} className="p-9 rounded-[32px] border group hover:-translate-y-2 transition-all cursor-default" style={{ background: T.surface, borderColor: T.border }}>
+                <div className="flex items-start justify-between mb-7">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ background: `rgba(196,149,106,0.15)`, color: T.accent }}>
+                    {React.cloneElement(f.icon, { className: "w-6 h-6" })}
                   </div>
-                  <div className="text-4xl font-black text-[#14f1d9] tracking-tighter">$9.99<span className="text-sm text-slate-600 font-bold">/mo</span></div>
+                  <span className="text-3xl font-black" style={{ color: `rgba(196,149,106,0.2)` }}>{f.num}</span>
                 </div>
+                <h3 className="text-xl font-black mb-4 tracking-tight" style={{ color: T.dark }}>{f.title}</h3>
+                <p className="leading-relaxed font-medium text-sm" style={{ color: T.mid }}>{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-                <button
-                  onClick={() => navigate("/signup")}
-                  className="w-full py-5 bg-white text-[#020617] rounded-3xl font-black text-xl hover:bg-[#14f1d9] transition-all shadow-xl active:scale-95 mb-8"
-                >
-                  Upgrade Now
+      {/* ══ HOW IT WORKS ════════════════════════════════════════ */}
+      <section id="how" className="py-32 px-8 border-t" style={{ borderColor: T.border, background: T.surface }}>
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-20">
+            <p className="text-xs font-black uppercase tracking-[0.3em] mb-5" style={{ color: T.accent }}>The Process</p>
+            <h2 className="text-5xl font-black tracking-tight" style={{ color: T.dark }}>
+              From upload to caption<br /><span style={{ color: T.accent }}>in 3 simple steps</span>
+            </h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-10">
+            {[
+              { step: "01", icon: <Upload />, title: "Upload Your Image", desc: "Drag & drop or click to upload any image from your device. Supports JPG, PNG, and WebP up to 10MB." },
+              { step: "02", icon: <Wand2 />, title: "AI Analyzes the Scene", desc: "Our Gemini Vision model scans every element — objects, mood, context, colors — to deeply understand your image." },
+              { step: "03", icon: <Copy />, title: "Copy & Post Instantly", desc: "Receive platform-ready captions with your chosen tone. Copy with one click and post to any social media." }
+            ].map((s, i) => (
+              <div key={i} className="group cursor-default">
+                <div className="p-10 rounded-[32px] border bg-white hover:shadow-xl transition-all group-hover:-translate-y-2" style={{ borderColor: T.border }}>
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform" style={{ background: T.dark }}>
+                      {React.cloneElement(s.icon, { className: "w-7 h-7" })}
+                    </div>
+                    <span className="text-6xl font-black group-hover:text-[#c4956a] transition-colors" style={{ color: `rgba(196,149,106,0.15)` }}>{s.step}</span>
+                  </div>
+                  <h3 className="text-xl font-black mb-4 tracking-tight" style={{ color: T.dark }}>{s.title}</h3>
+                  <p className="leading-relaxed font-medium" style={{ color: T.mid }}>{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ PRICING CTA ═════════════════════════════════════════ */}
+      <section id="pricing" className="py-32 px-8 border-t" style={{ borderColor: T.border }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="rounded-[48px] p-16 md:p-24 overflow-hidden relative" style={{ background: T.dark }}>
+            <div className="absolute inset-0 pointer-events-none" style={{ background: `radial-gradient(circle at 70% 30%, rgba(196,149,106,0.1) 0%, transparent 60%)` }}></div>
+            <div className="relative z-10 text-center">
+              <p className="text-xs font-black uppercase tracking-[0.3em] mb-6" style={{ color: T.accent }}>Get Started Today</p>
+              <h2 className="text-6xl font-black tracking-tight mb-8 text-white">
+                Free to start.<br /><span style={{ color: T.accent }}>Unlimited potential.</span>
+              </h2>
+              <p className="text-xl font-medium mb-12 max-w-xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.5)" }}>
+                No credit card required. Start generating AI captions from your images in under 60 seconds.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-12">
+                <button onClick={() => navigate("/signup")} className="group flex items-center gap-3 px-10 py-5 rounded-2xl font-black text-xl text-white shadow-2xl transition-all hover:scale-[1.03] active:scale-95" style={{ background: T.accent }} onMouseEnter={e => e.currentTarget.style.background = T.accentHover} onMouseLeave={e => e.currentTarget.style.background = T.accent}>
+                  Create Free Account <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
                 </button>
-
-                <p className="text-center text-slate-600 text-sm font-bold tracking-tight">7-Day Free Trial Available</p>
+                <button onClick={() => navigate("/login")} className="px-10 py-5 rounded-2xl font-bold text-xl border transition-all" style={{ border: "1px solid rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }} onMouseEnter={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.3)"; e.currentTarget.style.color = "white"; }} onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; e.currentTarget.style.color = "rgba(255,255,255,0.5)"; }}>
+                  Sign In Instead
+                </button>
+              </div>
+              <div className="flex flex-wrap justify-center gap-8">
+                {["✅ Free forever tier", "✅ No credit card needed", "✅ Instant setup", "✅ 100 captions/month free"].map(f => (
+                  <span key={f} className="text-sm font-semibold" style={{ color: "rgba(255,255,255,0.4)" }}>{f}</span>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* How it Works */}
-      <section id="steps" className="py-32 px-6 bg-slate-900/40 border-y border-white/5">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-6 text-left">
-            <div className="max-w-xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#14f1d9]/10 text-[#14f1d9] text-[10px] font-black uppercase tracking-widest mb-6">Expertise</div>
-              <h2 className="text-6xl font-black tracking-tight uppercase italic mb-8">Simple 3-Step <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14f1d9] to-cyan-400">Process</span></h2>
-              <p className="text-slate-400 text-lg font-medium leading-relaxed">From raw pixel data to engagement-ready copy in seconds. No complex prompt engineering required.</p>
+      {/* ══ FOOTER ══════════════════════════════════════════════ */}
+      <footer className="py-14 px-8 border-t" style={{ borderColor: T.border }}>
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: T.dark }}>
+              <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
             </div>
+            <span className="text-lg font-black" style={{ color: T.dark }}>Caption<span style={{ color: T.accent }}>AI</span></span>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-20 relative">
-            <div className="hidden md:block absolute top-[28%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800 to-transparent -z-10"></div>
-
-            <div className="relative group text-left">
-              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">01</div>
-              <h4 className="text-2xl font-black mb-4">Upload Visuals</h4>
-              <p className="text-slate-500 font-medium leading-relaxed">Securely upload any format (JPG/PNG) using our high-speed global cloud engine.</p>
-            </div>
-
-            <div className="relative group text-left">
-              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">02</div>
-              <h4 className="text-2xl font-black mb-4">AI Scan</h4>
-              <p className="text-slate-500 font-medium leading-relaxed">Our advanced neural network analyzes the mood, colors, and vibes of your image instantly.</p>
-            </div>
-
-            <div className="relative group text-left">
-              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">03</div>
-              <h4 className="text-2xl font-black mb-4">Get Captions</h4>
-              <p className="text-slate-500 font-medium leading-relaxed">Receive multiple caption variants tailored to your brand's unique social voice.</p>
-            </div>
+          <div className="flex gap-8">
+            {["Privacy", "Terms", "Twitter", "GitHub", "Contact"].map(l => (
+              <a key={l} href="#" className="text-sm font-medium transition-colors" style={{ color: T.muted }} onMouseEnter={e => e.target.style.color = T.accent} onMouseLeave={e => e.target.style.color = T.muted}>{l}</a>
+            ))}
           </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-20 px-6 border-t border-white/5 relative bg-[#020617]">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
-          <div className="flex items-center gap-2 group cursor-pointer">
-            <div className="w-10 h-10 bg-[#14f1d9]/20 rounded-xl flex items-center justify-center text-[#14f1d9]">
-              <Zap className="w-6 h-6" />
-            </div>
-            <span className="text-2xl font-black tracking-tighter uppercase italic">AI Captioner</span>
-          </div>
-
-          <div className="flex gap-8 text-sm font-black text-slate-500 uppercase tracking-[0.2em]">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Twitter</a>
-            <a href="#" className="hover:text-white transition-colors">Contact</a>
-          </div>
-
-          <p className="text-sm font-bold text-slate-600">Created by Isha Singh © 2026</p>
+          <p className="text-sm font-medium" style={{ color: T.muted }}>Built by <span style={{ color: T.mid }}>Isha Singh</span> © 2026</p>
         </div>
       </footer>
     </div>

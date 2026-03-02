@@ -53,12 +53,21 @@ const App = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#020617]">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#fafafa", fontFamily: "'Inter', sans-serif" }}>
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-[#14f1d9] border-t-transparent rounded-full animate-spin mx-auto mb-6 shadow-xl shadow-[#14f1d9]/20"></div>
-          <p className="text-[#14f1d9] font-black text-xl tracking-tighter uppercase italic animate-pulse">
-            System Initializing...
-          </p>
+          <div className="relative w-14 h-14 mx-auto mb-8">
+            <div className="absolute inset-0 border-4 rounded-full" style={{ borderColor: "#e8e0d5" }}></div>
+            <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderTopColor: "transparent", borderColor: "#c4956a #c4956a #c4956a transparent" }}></div>
+          </div>
+          <div className="flex items-center gap-2.5 justify-center">
+            <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "#1a1a1a" }}>
+              <svg className="w-4 h-4 fill-current" style={{ color: "#c4956a" }} viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+            </div>
+            <span className="font-black text-xl tracking-tight" style={{ color: "#1a1a1a" }}>
+              Caption<span style={{ color: "#c4956a" }}>AI</span>
+            </span>
+          </div>
+          <p className="text-sm font-medium mt-3 uppercase tracking-widest" style={{ color: "#9a9a9a" }}>Initializing...</p>
         </div>
       </div>
     );
