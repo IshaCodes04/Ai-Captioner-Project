@@ -16,7 +16,6 @@ const T = {
 const ImageCaptioner = ({ onLogout, user }) => {
     const navigate = useNavigate();
     const [previewUrl, setPreviewUrl] = useState(null);
-    const [uploadedImage, setUploadedImage] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [caption, setCaption] = useState("");
     const [captionStyle, setCaptionStyle] = useState("casual");
@@ -50,8 +49,6 @@ const ImageCaptioner = ({ onLogout, user }) => {
             const formData = new FormData();
             formData.append("image", file);
             const res = await axios.post("http://localhost:3000/api/posts", formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
-            const imageUrl = res.data?.post?.image || previewUrl;
-            setUploadedImage(imageUrl);
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast("Caption generated! ✨");
@@ -89,7 +86,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
     };
 
     return (
-        <div className="min-h-screen" style={{ background: T.bg, fontFamily: "'Inter',sans-serif", color: T.dark }}>
+        <div className="min-h-screen" style={{ background: T.bg, fontFamily: "'Outfit', sans-serif", color: T.dark }}>
 
             {/* TOAST */}
             {toast.show && (
@@ -161,7 +158,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                 <div className="relative">
                                     <img src={previewUrl} alt="Preview" className="w-full max-h-[520px] object-cover rounded-[30px]" />
                                     <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all rounded-[30px] flex items-center justify-center gap-5" style={{ background: "rgba(26,26,26,0.6)", backdropFilter: "blur(4px)" }}>
-                                        <button onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setUploadedImage(null); setCaption(""); }}
+                                        <button onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setCaption(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}
                                             className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(239,68,68,0.8)" }}>
                                             <Trash2 className="w-4 h-4" /> Remove
                                         </button>

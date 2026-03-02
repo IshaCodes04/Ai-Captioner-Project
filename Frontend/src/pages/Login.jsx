@@ -35,7 +35,7 @@ const Login = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: T.bg, fontFamily: "'Inter',sans-serif" }}>
+      style={{ background: T.bg, fontFamily: "'Outfit', sans-serif" }}>
 
       {/* Subtle ambient glows */}
       <div className="absolute top-0 left-0 w-[500px] h-[500px] pointer-events-none opacity-60"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowRight, Sparkles, Zap, Upload, Image, Copy, Wand2, Globe, Shield, CheckCircle2, Star, Play, ChevronRight } from "lucide-react";
+import { ArrowRight, Sparkles, Zap, Upload, Image, Copy, Wand2, Globe, Shield, CheckCircle2, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 /* ── Brand tokens ─────────────────────────────── */
@@ -36,7 +36,7 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden" style={{ background: T.bg, fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden" style={{ background: T.bg, fontFamily: "'Outfit', sans-serif" }}>
 
       {/* ══ NAVBAR ══════════════════════════════════════════════ */}
       <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-sm border-b border-[#e8e0d5]" : ""}`}>

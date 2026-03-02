@@ -46,7 +46,7 @@ const Signup = ({ onSignupSuccess }) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden"
-      style={{ background: T.bg, fontFamily: "'Inter',sans-serif" }}>
+      style={{ background: T.bg, fontFamily: "'Outfit', sans-serif" }}>
 
       {/* Glows */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] pointer-events-none opacity-60"
