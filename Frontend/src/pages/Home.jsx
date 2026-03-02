@@ -1,667 +1,264 @@
-import React, { useState, useRef } from "react";
-import axios from "axios";
-import {
-  Upload,
-  Copy,
-  Sparkles,
-  Moon,
-  Sun,
-  Github,
-  FileText,
-  LogOut,
-  Download,
-  RefreshCw,
-  History,
-  Zap,
-} from "lucide-react";
+import React from "react";
+import { ArrowRight, Zap, Sparkles, Wand2, Shield, Globe, Layers, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const Home = ({ isDarkMode, setIsDarkMode, onLogout, user }) => {
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [caption, setCaption] = useState("");
-  const [captionStyle, setCaptionStyle] = useState("casual");
-  const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [dragOver, setDragOver] = useState(false);
-  const [captionHistory, setCaptionHistory] = useState([]);
-  const [showHistory, setShowHistory] = useState(false);
-  const [Error, setError] = useState("");
-  const fileInputRef = useRef(null);
-
-  const captionStyles = [
-    { id: "casual", label: "Casual 😎", icon: "😎" },
-    { id: "funny", label: "Funny 😂", icon: "😂" },
-    { id: "professional", label: "Professional 💼", icon: "💼" },
-    { id: "poetic", label: "Poetic 🎭", icon: "🎭" },
-    { id: "hashtags", label: "With Hashtags #️⃣", icon: "#️⃣" },
-  ];
-
-  const showToastMessage = (message) => {
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000);
-  };
-
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    setDragOver(true);
-  };
-
-  const handleDragLeave = (event) => {
-    event.preventDefault();
-    setDragOver(false);
-  };
-
-  const handleDrop = (event) => {
-    event.preventDefault();
-    setDragOver(false);
-    const files = event.dataTransfer && event.dataTransfer.files;
-    if (files && files.length > 0) {
-      handleFileUpload(files[0]);
-    }
-  };
-
-  const handleFileUpload = async (file) => {
-    if (!file || !file.type.startsWith("image/")) {
-      showToastMessage("Please upload a valid image file");
-      return;
-    }
-
-    try {
-      setIsGenerating(true);
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const res = await axios.post(
-        "http://localhost:3000/api/posts",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-          withCredentials: true,
-        }
-      );
-
-      // Get image URL from backend response
-      const imageUrl = res.data?.post?.image || "";
-      setUploadedImage(imageUrl);
-      
-      // Get generated caption from backend
-      const generatedCaption = res.data?.post?.caption || "";
-      setCaption(generatedCaption);
-      
-      setIsGenerating(false);
-      showToastMessage("Post created successfully! ✨");
-
-      // Add to history
-      const newHistoryItem = {
-        id: Date.now(),
-        caption: generatedCaption,
-        style: "auto-generated",
-        timestamp: new Date().toLocaleTimeString(),
-      };
-
-      setCaptionHistory((prevHistory) => [
-        newHistoryItem,
-        ...prevHistory.slice(0, 4),
-      ]);
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || "Failed to create post. Please try again.");
-      showToastMessage("Upload failed ❌");
-      setIsGenerating(false);
-    }
-  };
-
-  const generateCaption = () => {
-    setIsGenerating(true);
-    setCaption("");
-
-    // Simulate AI processing
-    setTimeout(() => {
-      const sampleCaptions = {
-        casual:
-          "Just captured this amazing moment! ✨ Life is beautiful when you take time to notice the little things.",
-        funny:
-          "When you accidentally take the perfect photo and pretend it was totally planned 😅📸",
-        professional:
-          "Exploring new perspectives through visual storytelling. Every image tells a unique story worth sharing.",
-        poetic:
-          "In this fleeting moment, time stands still, and beauty whispers secrets only the heart can hear. 🌟",
-        hashtags:
-          "Living my best life! ✨ #photography #moments #beautiful #inspiration #blessed #goodvibes #memories",
-      };
-
-      const generatedCaption = sampleCaptions[captionStyle];
-      setCaption(generatedCaption);
-      setIsGenerating(false);
-
-      // Add to history
-      const newHistoryItem = {
-        id: Date.now(),
-        caption: generatedCaption,
-        style: captionStyle,
-        timestamp: new Date().toLocaleTimeString(),
-      };
-
-      setCaptionHistory((prevHistory) => [
-        newHistoryItem,
-        ...prevHistory.slice(0, 4),
-      ]);
-    }, 2000);
-  };
-
-  const copyCaption = async () => {
-    try {
-      if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(caption);
-        showToastMessage("Caption copied to clipboard! 🎉");
-      } else {
-        // Fallback for older browsers
-        const textArea = document.createElement("textarea");
-        textArea.value = caption;
-        textArea.style.position = "fixed";
-        textArea.style.left = "-999999px";
-        textArea.style.top = "-999999px";
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-
-        const successful = document.execCommand("copy");
-        document.body.removeChild(textArea);
-
-        if (successful) {
-          showToastMessage("Caption copied to clipboard! 🎉");
-        } else {
-          showToastMessage("Failed to copy caption");
-        }
-      }
-    } catch {
-      showToastMessage("Failed to copy caption");
-    }
-  };
-
-  const triggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handleFileInputChange = (event) => {
-    const file = event.target && event.target.files && event.target.files[0];
-    if (file) {
-      handleFileUpload(file);
-    }
-  };
-
-  const removeImage = (event) => {
-    event.stopPropagation();
-    setUploadedImage(null);
-    setCaption("");
-  };
-
-  const findCaptionStyleLabel = (styleId) => {
-    const style = captionStyles.find((s) => s.id === styleId);
-    return style ? style.label : styleId;
-  };
+const Home = () => {
+  const navigate = useNavigate();
 
   return (
-    <div
-      className={`min-h-screen transition-all duration-500 ${
-        isDarkMode
-          ? "bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900"
-          : "bg-gradient-to-br from-pink-100 via-purple-100 to-blue-100"
-      }`}
-    >
-      {/* Toast Notification */}
-      {showToast && (
-        <div className="fixed top-4 right-4 z-50">
-          <div
-            className={`px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
-              isDarkMode ? "bg-gray-800 text-white" : "bg-white text-gray-800"
-            } border border-purple-200`}
-          >
-            {toastMessage}
+    <div className="min-h-screen bg-[#020617] font-['Inter'] selection:bg-[#14f1d9]/30 text-white overflow-x-hidden">
+      {/* Navbar */}
+      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl border-b border-white/5 bg-[#020617]/50">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center text-sm font-bold uppercase tracking-wider">
+          <div className="flex items-center gap-2 group cursor-pointer transition-all hover:scale-105">
+            <div className="w-10 h-10 bg-[#14f1d9] rounded-xl flex items-center justify-center text-[#020617] shadow-lg shadow-[#14f1d9]/20">
+              <Zap className="w-6 h-6 fill-current" />
+            </div>
+            <span className="text-xl font-black text-white tracking-tighter">AI Captioner</span>
           </div>
-        </div>
-      )}
 
-      {/* Header */}
-      <nav
-        className={`sticky top-0 z-40 backdrop-blur-md ${
-          isDarkMode ? "bg-gray-900/80" : "bg-white/80"
-        } border-b ${isDarkMode ? "border-gray-700" : "border-purple-200"}`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">🖼️</span>
-              <span
-                className={`text-xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
-              >
-                AI Captioner
-              </span>
-            </div>
+          <div className="hidden md:flex items-center gap-10 text-slate-400">
+            <a href="#features" className="hover:text-[#14f1d9] transition-colors">Features</a>
+            <a href="#steps" className="hover:text-[#14f1d9] transition-colors">How it works</a>
+            <a href="#about" className="hover:text-[#14f1d9] transition-colors">About</a>
+          </div>
 
-            <div className="flex items-center space-x-4">
-              <span
-                className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}
-              >
-                Welcome, <span className="font-semibold">{user?.username}</span>!
-              </span>
-              <button
-                className={`p-2 rounded-lg transition-all hover:scale-105 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 text-gray-300"
-                    : "hover:bg-purple-100 text-gray-600"
-                }`}
-              >
-                <FileText className="w-5 h-5" />
-              </button>
-              <button
-                className={`p-2 rounded-lg transition-all hover:scale-105 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 text-gray-300"
-                    : "hover:bg-purple-100 text-gray-600"
-                }`}
-              >
-                <Github className="w-5 h-5" />
-              </button>
-              <button
-                onClick={onLogout}
-                className={`p-2 rounded-lg transition-all hover:scale-105 flex items-center space-x-1 ${
-                  isDarkMode
-                    ? "hover:bg-red-900/30 text-red-400"
-                    : "hover:bg-red-100 text-red-600"
-                }`}
-              >
-                <LogOut className="w-5 h-5" />
-                <span className="text-sm">Logout</span>
-              </button>
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`p-2 rounded-lg transition-all hover:scale-105 ${
-                  isDarkMode
-                    ? "hover:bg-gray-700 text-yellow-400"
-                    : "hover:bg-purple-100 text-purple-600"
-                }`}
-              >
-                {isDarkMode ? (
-                  <Sun className="w-5 h-5" />
-                ) : (
-                  <Moon className="w-5 h-5" />
-                )}
-              </button>
-            </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/login")}
+              className="px-6 py-2.5 rounded-full text-white hover:text-[#14f1d9] transition-all"
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => navigate("/signup")}
+              className="px-6 py-2.5 bg-white text-[#020617] rounded-full hover:bg-[#14f1d9] transition-all shadow-xl shadow-white/5 active:scale-95"
+            >
+              Get Started
+            </button>
           </div>
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Upload Section */}
-          <div className="space-y-6">
-            <div
-              className={`backdrop-blur-md rounded-2xl p-6 shadow-xl border transition-all duration-300 ${
-                isDarkMode
-                  ? "bg-gray-800/50 border-gray-600"
-                  : "bg-white/50 border-purple-200"
-              }`}
-            >
-              <h2
-                className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
-              >
-                Upload Your Image ✨
-              </h2>
+      {/* Hero Section */}
+      <section className="relative pt-48 pb-32 px-6">
+        {/* Glow Effects */}
+        <div className="absolute top-[10%] left-[20%] w-[500px] h-[500px] bg-[#14f1d9]/10 rounded-full blur-[140px] pointer-events-none animate-pulse"></div>
+        <div className="absolute bottom-[10%] right-[10%] w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
 
-              <div
-                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all duration-300 cursor-pointer ${
-                  dragOver
-                    ? isDarkMode
-                      ? "border-purple-400 bg-purple-400/10"
-                      : "border-purple-500 bg-purple-50"
-                    : isDarkMode
-                    ? "border-gray-600 hover:border-purple-400"
-                    : "border-purple-300 hover:border-purple-500"
-                } ${dragOver ? "scale-105" : "hover:scale-102"}`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={triggerFileInput}
-              >
-                {uploadedImage ? (
-                  <div className="space-y-4">
-                    <img
-                      src={uploadedImage}
-                      alt="Uploaded"
-                      className="max-w-full h-64 object-contain mx-auto rounded-lg shadow-lg transition-all duration-500"
-                    />
-                    <button
-                      onClick={removeImage}
-                      className={`px-4 py-2 rounded-lg transition-all hover:scale-105 ${
-                        isDarkMode
-                          ? "bg-red-600 hover:bg-red-700 text-white"
-                          : "bg-red-500 hover:bg-red-600 text-white"
-                      }`}
-                    >
-                      Remove Image
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <Upload
-                      className={`w-16 h-16 mx-auto ${
-                        isDarkMode ? "text-gray-400" : "text-purple-400"
-                      } ${dragOver ? "animate-bounce" : ""}`}
-                    />
-                    <div>
-                      <p
-                        className={`text-lg font-semibold ${
-                          isDarkMode ? "text-white" : "text-gray-800"
-                        }`}
-                      >
-                        {dragOver
-                          ? "Drop it here 🚀"
-                          : "Drag & drop your image"}
-                      </p>
-                      <p
-                        className={`text-sm ${
-                          isDarkMode ? "text-gray-400" : "text-gray-600"
-                        }`}
-                      >
-                        or click to choose a file
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileInputChange}
-                  className="hidden"
-                />
-              </div>
-
-              {uploadedImage && (
-                <div className="mt-6">
-                  <label
-                    className={`block text-sm font-medium mb-2 ${
-                      isDarkMode ? "text-white" : "text-gray-800"
-                    }`}
-                  >
-                    Caption Style
-                  </label>
-                  <select
-                    value={captionStyle}
-                    onChange={(e) => setCaptionStyle(e.target.value)}
-                    className={`w-full p-3 rounded-lg border transition-all ${
-                      isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white"
-                        : "bg-white border-purple-300 text-gray-800"
-                    }`}
-                  >
-                    {captionStyles.map((style) => (
-                      <option key={style.id} value={style.id}>
-                        {style.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-
-            {/* History Panel */}
-            {captionHistory.length > 0 && (
-              <div
-                className={`backdrop-blur-md rounded-2xl p-6 shadow-xl border transition-all duration-300 ${
-                  isDarkMode
-                    ? "bg-gray-800/50 border-gray-600"
-                    : "bg-white/50 border-purple-200"
-                }`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3
-                    className={`text-lg font-bold ${
-                      isDarkMode ? "text-white" : "text-gray-800"
-                    }`}
-                  >
-                    <History className="w-5 h-5 inline mr-2" />
-                    Recent Captions
-                  </h3>
-                  <button
-                    onClick={() => setShowHistory(!showHistory)}
-                    className={`p-1 rounded transition-all hover:scale-105 ${
-                      isDarkMode
-                        ? "hover:bg-gray-700 text-gray-300"
-                        : "hover:bg-purple-100 text-gray-600"
-                    }`}
-                  >
-                    {showHistory ? "−" : "+"}
-                  </button>
-                </div>
-
-                {showHistory && (
-                  <div className="space-y-2 transition-all duration-300">
-                    {captionHistory.map((item) => (
-                      <div
-                        key={item.id}
-                        className={`p-3 rounded-lg cursor-pointer transition-all hover:scale-102 ${
-                          isDarkMode
-                            ? "bg-gray-700/50 hover:bg-gray-700"
-                            : "bg-purple-50 hover:bg-purple-100"
-                        }`}
-                        onClick={() => setCaption(item.caption)}
-                      >
-                        <p
-                          className={`text-sm ${
-                            isDarkMode ? "text-gray-300" : "text-gray-700"
-                          }`}
-                        >
-                          {item.caption.slice(0, 60)}...
-                        </p>
-                        <p
-                          className={`text-xs ${
-                            isDarkMode ? "text-gray-500" : "text-gray-500"
-                          }`}
-                        >
-                          {item.timestamp} • {findCaptionStyleLabel(item.style)}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
+        <div className="max-w-7xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 text-[#14f1d9] text-xs font-black uppercase tracking-[0.2em] mb-8 animate-fadeIn">
+            <Sparkles className="w-4 h-4 fill-current" />
+            Empowering 10k+ Creators with AI
           </div>
 
-          {/* Caption Output Section */}
-          <div className="space-y-6">
-            <div
-              className={`backdrop-blur-md rounded-2xl p-6 shadow-xl border transition-all duration-300 ${
-                isDarkMode
-                  ? "bg-gray-800/50 border-gray-600"
-                  : "bg-white/50 border-purple-200"
-              }`}
+          <h1 className="text-7xl md:text-[92px] font-[900] leading-[0.95] tracking-[-0.04em] mb-10 animate-slideUp">
+            The Future of <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14f1d9] via-cyan-400 to-emerald-400">
+              Visual Storytelling
+            </span>
+          </h1>
+
+          <p className="max-w-2xl mx-auto text-slate-400 text-xl font-medium leading-relaxed mb-12 animate-fadeIn opacity-80">
+            Transform your images into viral narratives instantly. AI Captioner understands the context, soul, and vibes of your visuals better than ever before.
+          </p>
+
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 animate-slideUp">
+            <button
+              onClick={() => navigate("/signup")}
+              className="group relative px-10 py-5 bg-[#14f1d9] text-[#020617] font-black text-xl rounded-2xl shadow-2xl shadow-[#14f1d9]/20 hover:scale-[1.05] active:scale-95 transition-all overflow-hidden"
             >
-              <h2
-                className={`text-2xl font-bold mb-4 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
-              >
-                Generated Caption 🚀
-              </h2>
+              <div className="absolute inset-x-0 bottom-0 h-1 bg-black/10 group-hover:h-full transition-all"></div>
+              <div className="relative flex items-center gap-3">
+                Start Creating Free
+                <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
+              </div>
+            </button>
 
-              {isGenerating ? (
-                <div className="text-center py-12 transition-all duration-500">
-                  <div className="relative">
-                    <Sparkles
-                      className={`w-16 h-16 mx-auto animate-spin ${
-                        isDarkMode ? "text-purple-400" : "text-purple-500"
-                      }`}
-                    />
-                    <div className="absolute inset-0 w-16 h-16 mx-auto animate-ping">
-                      <Sparkles
-                        className={`w-16 h-16 ${
-                          isDarkMode
-                            ? "text-purple-400/30"
-                            : "text-purple-500/30"
-                        }`}
-                      />
-                    </div>
-                  </div>
-                  <p
-                    className={`mt-4 text-lg animate-pulse ${
-                      isDarkMode ? "text-white" : "text-gray-800"
-                    }`}
-                  >
-                    Thinking... creating your perfect caption ✨
-                  </p>
-                  <div className="flex justify-center mt-2 space-x-1">
-                    <div
-                      className={`w-2 h-2 rounded-full animate-bounce ${
-                        isDarkMode ? "bg-purple-400" : "bg-purple-500"
-                      }`}
-                      style={{ animationDelay: "0ms" }}
-                    ></div>
-                    <div
-                      className={`w-2 h-2 rounded-full animate-bounce ${
-                        isDarkMode ? "bg-purple-400" : "bg-purple-500"
-                      }`}
-                      style={{ animationDelay: "150ms" }}
-                    ></div>
-                    <div
-                      className={`w-2 h-2 rounded-full animate-bounce ${
-                        isDarkMode ? "bg-purple-400" : "bg-purple-500"
-                      }`}
-                      style={{ animationDelay: "300ms" }}
-                    ></div>
-                  </div>
+            <button className="px-10 py-5 border border-slate-800 rounded-2xl font-black text-xl text-slate-300 hover:bg-white hover:text-[#020617] transition-all">
+              Watch Demo
+            </button>
+          </div>
+
+          {/* Social Proof Dashboard Mockup */}
+          <div className="mt-24 relative max-w-5xl mx-auto rounded-[40px] border border-white/10 bg-slate-900/50 p-4 backdrop-blur-3xl group shadow-2xl hover:border-slate-700 transition-all duration-700">
+            <div className="rounded-[30px] overflow-hidden border border-white/5 bg-[#020617]">
+              <div className="h-10 bg-slate-900/80 flex items-center gap-2 px-6 border-b border-white/5">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
+                  <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
                 </div>
-              ) : caption ? (
-                <div className="space-y-4 transition-all duration-500">
-                  <div
-                    className={`p-4 rounded-lg ${
-                      isDarkMode ? "bg-gray-700/50" : "bg-purple-50"
-                    }`}
-                  >
-                    <p
-                      className={`text-lg leading-relaxed ${
-                        isDarkMode ? "text-white" : "text-gray-800"
-                      }`}
-                    >
-                      {caption}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={copyCaption}
-                      className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:scale-105 transition-all shadow-lg hover:shadow-xl"
-                    >
-                      <Copy className="w-4 h-4" />
-                      <span>Copy Caption</span>
-                    </button>
-
-                    <button
-                      onClick={generateCaption}
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all hover:scale-105 ${
-                        isDarkMode
-                          ? "bg-gray-700 hover:bg-gray-600 text-white"
-                          : "bg-white hover:bg-gray-50 text-gray-800 border border-purple-200"
-                      }`}
-                    >
-                      <RefreshCw className="w-4 h-4" />
-                      <span>Generate New</span>
-                    </button>
-
-                    <button
-                      className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all hover:scale-105 ${
-                        isDarkMode
-                          ? "bg-gray-700 hover:bg-gray-600 text-white"
-                          : "bg-white hover:bg-gray-50 text-gray-800 border border-purple-200"
-                      }`}
-                    >
-                      <Download className="w-4 h-4" />
-                      <span>Save</span>
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <Zap
-                    className={`w-16 h-16 mx-auto mb-4 ${
-                      isDarkMode ? "text-gray-600" : "text-gray-400"
-                    }`}
-                  />
-                  <p
-                    className={`text-lg ${
-                      isDarkMode ? "text-gray-400" : "text-gray-600"
-                    }`}
-                  >
-                    Upload an image to generate a caption
-                  </p>
-                </div>
-              )}
+              </div>
+              <div className="p-10 font-black text-4xl text-slate-800 flex items-center justify-center min-h-[400px] uppercase italic tracking-tighter opacity-20">
+                Interactive Tool Preview
+              </div>
             </div>
 
-            {/* Quick Tips */}
-            <div
-              className={`backdrop-blur-md rounded-2xl p-6 shadow-xl border transition-all duration-300 ${
-                isDarkMode
-                  ? "bg-gray-800/50 border-gray-600"
-                  : "bg-white/50 border-purple-200"
-              }`}
-            >
-              <h3
-                className={`text-lg font-bold mb-3 ${
-                  isDarkMode ? "text-white" : "text-gray-800"
-                }`}
-              >
-                💡 Quick Tips
-              </h3>
-              <ul
-                className={`space-y-2 text-sm ${
-                  isDarkMode ? "text-gray-300" : "text-gray-600"
-                }`}
-              >
-                <li>• Upload clear, high-quality images for better captions</li>
-                <li>• AI generates captions based on image content</li>
-                <li>• Use the history panel to revisit previous captions</li>
-                <li>• Generated captions are perfect for social media posts</li>
-              </ul>
+            {/* Floating UI elements */}
+            <div className="absolute top-20 -right-20 p-6 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl animate-float">
+              <div className="w-12 h-12 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 text-purple-400" />
+              </div>
+              <div className="w-32 h-2 bg-slate-800 rounded-full mb-2"></div>
+              <div className="w-20 h-2 bg-slate-800/50 rounded-full"></div>
+            </div>
+
+            <div className="absolute -bottom-10 -left-10 p-6 bg-[#0f172a] border border-slate-800 rounded-3xl shadow-2xl animate-float" style={{ animationDelay: '1s' }}>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-[#14f1d9] rounded-full flex items-center justify-center text-[#020617]">
+                  <Zap className="w-5 h-5 fill-current" />
+                </div>
+                <div>
+                  <div className="w-24 h-2 bg-slate-800 rounded-full mb-1"></div>
+                  <div className="w-16 h-1.5 bg-[#14f1d9]/30 rounded-full"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Features Grid */}
+      <section id="features" className="py-32 px-6 bg-[#020617]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-24">
+            <h2 className="text-5xl font-black mb-6 tracking-tight uppercase italic">Everything You Need</h2>
+            <p className="text-slate-400 text-lg font-medium">Built with the world's most advanced AI models for professional results.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
+              <div className="w-16 h-16 bg-[#14f1d9]/10 rounded-2xl flex items-center justify-center text-[#14f1d9] mb-8 group-hover:scale-110 transition-transform">
+                <Wand2 className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black mb-4">Neural Analysis</h3>
+              <p className="text-slate-400 leading-relaxed">Deep learning models that recognize over 50k unique objects and scenes instantly.</p>
+            </div>
+
+            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
+              <div className="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-400 mb-8 group-hover:scale-110 transition-transform">
+                <Globe className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black mb-4">Multi-Lingual</h3>
+              <p className="text-slate-400 leading-relaxed">Generate perfect captions in 40+ languages including Hindi, Spanish, and French.</p>
+            </div>
+
+            <div className="p-10 rounded-[40px] bg-slate-900 shadow-xl hover:bg-slate-800/80 transition-all border border-slate-800 group">
+              <div className="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 mb-8 group-hover:scale-110 transition-transform">
+                <Layers className="w-8 h-8" />
+              </div>
+              <h3 className="text-2xl font-black mb-4">Unlimited Styles</h3>
+              <p className="text-slate-400 leading-relaxed">From sarcastic and funny to professional and poetic - we've got you covered.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing / Stats */}
+      <section className="py-32 px-6 bg-slate-900/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-20 items-center">
+            <div>
+              <h2 className="text-6xl font-black tracking-tight uppercase italic mb-8">Ready to <br /><span className="text-[#14f1d9]">Level Up?</span></h2>
+              <p className="text-slate-400 text-xl font-medium leading-relaxed mb-10">
+                Start for free and upgrade as you grow. No hidden fees, just pure AI power at your fingertips.
+              </p>
+
+              <div className="space-y-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
+                  <span className="text-lg font-bold text-slate-300">100 Free Captions / Month</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
+                  <span className="text-lg font-bold text-slate-300">Advanced Scene Recognition</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="w-6 h-6 rounded-full bg-[#14f1d9]/20 flex items-center justify-center text-[#14f1d9]">✓</div>
+                  <span className="text-lg font-bold text-slate-300">Save to Cloud History</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-[#14f1d9]/20 to-purple-500/20 blur-[100px] opacity-50 group-hover:opacity-100 transition-opacity"></div>
+              <div className="relative p-12 rounded-[48px] bg-slate-900 border border-white/10 shadow-2xl">
+                <div className="flex justify-between items-start mb-10">
+                  <div>
+                    <h4 className="text-2xl font-black mb-2">PRO PLAN</h4>
+                    <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">Power User Tier</p>
+                  </div>
+                  <div className="text-4xl font-black text-[#14f1d9] tracking-tighter">$9.99<span className="text-sm text-slate-600 font-bold">/mo</span></div>
+                </div>
+
+                <button
+                  onClick={() => navigate("/signup")}
+                  className="w-full py-5 bg-white text-[#020617] rounded-3xl font-black text-xl hover:bg-[#14f1d9] transition-all shadow-xl active:scale-95 mb-8"
+                >
+                  Upgrade Now
+                </button>
+
+                <p className="text-center text-slate-600 text-sm font-bold tracking-tight">7-Day Free Trial Available</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section id="steps" className="py-32 px-6 bg-slate-900/40 border-y border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col md:flex-row items-end justify-between mb-24 gap-6 text-left">
+            <div className="max-w-xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#14f1d9]/10 text-[#14f1d9] text-[10px] font-black uppercase tracking-widest mb-6">Expertise</div>
+              <h2 className="text-6xl font-black tracking-tight uppercase italic mb-8">Simple 3-Step <br /><span className="text-transparent bg-clip-text bg-gradient-to-r from-[#14f1d9] to-cyan-400">Process</span></h2>
+              <p className="text-slate-400 text-lg font-medium leading-relaxed">From raw pixel data to engagement-ready copy in seconds. No complex prompt engineering required.</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-20 relative">
+            <div className="hidden md:block absolute top-[28%] left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-800 to-transparent -z-10"></div>
+
+            <div className="relative group text-left">
+              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">01</div>
+              <h4 className="text-2xl font-black mb-4">Upload Visuals</h4>
+              <p className="text-slate-500 font-medium leading-relaxed">Securely upload any format (JPG/PNG) using our high-speed global cloud engine.</p>
+            </div>
+
+            <div className="relative group text-left">
+              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">02</div>
+              <h4 className="text-2xl font-black mb-4">AI Scan</h4>
+              <p className="text-slate-500 font-medium leading-relaxed">Our advanced neural network analyzes the mood, colors, and vibes of your image instantly.</p>
+            </div>
+
+            <div className="relative group text-left">
+              <div className="w-16 h-16 rounded-[24px] bg-slate-800 flex items-center justify-center text-2xl font-black mb-10 group-hover:bg-[#14f1d9] group-hover:text-[#020617] group-hover:scale-110 transition-all border border-white/5 shadow-2xl">03</div>
+              <h4 className="text-2xl font-black mb-4">Get Captions</h4>
+              <p className="text-slate-500 font-medium leading-relaxed">Receive multiple caption variants tailored to your brand's unique social voice.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Footer */}
-      <footer
-        className={`mt-16 ${
-          isDarkMode ? "bg-gray-900/50" : "bg-white/50"
-        } backdrop-blur-md border-t ${
-          isDarkMode ? "border-gray-700" : "border-purple-200"
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <p
-              className={`text-sm ${
-                isDarkMode ? "text-gray-400" : "text-gray-600"
-              }`}
-            >
-              Made with 💻✨ by{" "}
-              <span className="font-semibold text-purple-500">Isha</span> |
-              Powered by AI
-            </p>
+      <footer className="py-20 px-6 border-t border-white/5 relative bg-[#020617]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-10 h-10 bg-[#14f1d9]/20 rounded-xl flex items-center justify-center text-[#14f1d9]">
+              <Zap className="w-6 h-6" />
+            </div>
+            <span className="text-2xl font-black tracking-tighter uppercase italic">AI Captioner</span>
           </div>
+
+          <div className="flex gap-8 text-sm font-black text-slate-500 uppercase tracking-[0.2em]">
+            <a href="#" className="hover:text-white transition-colors">Privacy</a>
+            <a href="#" className="hover:text-white transition-colors">Terms</a>
+            <a href="#" className="hover:text-white transition-colors">Twitter</a>
+            <a href="#" className="hover:text-white transition-colors">Contact</a>
+          </div>
+
+          <p className="text-sm font-bold text-slate-600">Created by Isha Singh © 2026</p>
         </div>
       </footer>
     </div>
