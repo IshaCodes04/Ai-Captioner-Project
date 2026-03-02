@@ -2,15 +2,14 @@ const userModel = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-
 async function registerController(req, res) {
   try {
-    const { username, password } = req.body;
+    const { fullName, email, password } = req.body;
 
     // Validation
-    if (!username || !password) {
+    if (!fullName || !email || !password) {
       return res.status(400).json({
-        message: "Username and password are required"
+        message: "All fields (full name, email, and password) are required"
       });
     }
 
@@ -21,11 +20,11 @@ async function registerController(req, res) {
     }
 
     // Check if user already exists
-    const isUserAlreadyExists = await userModel.findOne({ username });
+    const isUserAlreadyExists = await userModel.findOne({ email });
 
     if (isUserAlreadyExists) {
       return res.status(400).json({
-        message: "This username is already taken"
+        message: "This email is already registered"
       });
     }
 
@@ -34,7 +33,8 @@ async function registerController(req, res) {
 
     // Create user
     const user = await userModel.create({
-      username,
+      fullName,
+      email,
       password: hashedPassword
     });
 
@@ -53,7 +53,8 @@ async function registerController(req, res) {
     return res.status(201).json({
       message: "User registered successfully",
       user: {
-        username: user.username,
+        fullName: user.fullName,
+        email: user.email,
         id: user._id
       }
     });
@@ -69,21 +70,21 @@ async function registerController(req, res) {
 
 async function loginController(req, res) {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     // Validation
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({
-        message: "Username and password are required"
+        message: "Email and password are required"
       });
     }
 
     // Find user
-    const user = await userModel.findOne({ username });
+    const user = await userModel.findOne({ email });
 
     if (!user) {
       return res.status(401).json({
-        message: "Invalid username or password"
+        message: "Invalid email or password"
       });
     }
 
@@ -92,7 +93,7 @@ async function loginController(req, res) {
 
     if (!isPasswordValid) {
       return res.status(401).json({
-        message: "Invalid username or password"
+        message: "Invalid email or password"
       });
     }
 
@@ -111,7 +112,8 @@ async function loginController(req, res) {
     res.status(200).json({
       message: "User logged in successfully",
       user: {
-        username: user.username,
+        fullName: user.fullName,
+        email: user.email,
         id: user._id
       }
     });
