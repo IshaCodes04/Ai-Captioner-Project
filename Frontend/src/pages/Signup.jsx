@@ -1,11 +1,24 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Eye, EyeOff, ArrowRight, Mail, Lock, Sparkles, Check, Rocket, Palette, Zap, Users } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  ArrowRight,
+  UserPlus,
+  Layers,
+  Globe,
+  Rocket,
+  Mail,
+  CheckCircle2,
+  Sparkles,
+  UserCheck
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const Signup = ({ onSignupSuccess, isDarkMode, setIsDarkMode }) => {
+const Signup = ({ onSignupSuccess }) => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -19,8 +32,7 @@ const Signup = ({ onSignupSuccess, isDarkMode, setIsDarkMode }) => {
     setError("");
     setSuccess("");
 
-    // Validation
-    if (!username || !password || !confirmPassword) {
+    if (!fullName || !email || !password || !confirmPassword) {
       setError("All fields are required");
       return;
     }
@@ -35,12 +47,19 @@ const Signup = ({ onSignupSuccess, isDarkMode, setIsDarkMode }) => {
       return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axios.post(
         "http://localhost:3000/api/auth/register",
         {
-          username,
+          fullName,
+          email,
           password,
         },
         {
@@ -48,13 +67,13 @@ const Signup = ({ onSignupSuccess, isDarkMode, setIsDarkMode }) => {
         }
       );
 
-      // Store user data in localStorage
       if (response.data?.user) {
         localStorage.setItem("user", JSON.stringify(response.data.user));
       }
 
-      setSuccess("Account created successfully! 🎉");
-      setUsername("");
+      setSuccess("Account created successfully!");
+      setFullName("");
+      setEmail("");
       setPassword("");
       setConfirmPassword("");
 
@@ -71,377 +90,240 @@ const Signup = ({ onSignupSuccess, isDarkMode, setIsDarkMode }) => {
   };
 
   return (
-    <div
-      className={`min-h-screen transition-all duration-500 overflow-hidden ${
-        isDarkMode
-          ? "bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900"
-          : "bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50"
-      } flex items-center justify-center`}
-    >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className={`absolute top-10 left-10 w-96 h-96 rounded-full blur-3xl opacity-20 ${
-          isDarkMode ? "bg-purple-600" : "bg-purple-400"
-        } animate-pulse`}></div>
-        <div className={`absolute bottom-10 right-10 w-96 h-96 rounded-full blur-3xl opacity-20 ${
-          isDarkMode ? "bg-blue-600" : "bg-blue-400"
-        } animate-pulse`}></div>
-      </div>
+    <div className="min-h-screen bg-[#020617] flex font-['Inter'] selection:bg-[#14f1d9]/30">
+      {/* LEFT SIDE - Features */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between px-16 py-12 relative overflow-hidden">
+        {/* Subtle background glows */}
+        <div className="absolute top-0 left-0 w-full h-full">
+          <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#14f1d9]/5 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 rounded-full blur-[100px]"></div>
+        </div>
 
-      {/* Main Container */}
-      <div className="w-full h-screen flex relative z-10">
-        {/* LEFT SIDE - Content */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-start px-12">
-          {/* Logo */}
-          <div className="mb-12 animate-fadeIn">
-            <div className="flex items-center gap-3 mb-4">
-              <div className={`p-3 rounded-2xl ${
-                isDarkMode ? "bg-purple-600/30" : "bg-purple-100"
-              }`}>
-                <Sparkles className={`w-8 h-8 ${
-                  isDarkMode ? "text-purple-400" : "text-purple-600"
-                }`} />
-              </div>
-              <div>
-                <h1 className={`text-4xl font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>AI Captioner</h1>
-                <p className={`text-sm ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}>Join Thousands of Creators</p>
-              </div>
-            </div>
-          </div>
+        <div className="relative z-10 w-full max-w-xl">
+          <p className="text-[#14f1d9] text-[11px] font-extrabold tracking-[0.25em] mb-12 uppercase opacity-90">
+            Join AI Captioner
+          </p>
 
-          {/* Benefits */}
-          <div className="space-y-8 mb-12">
-            <div className="flex gap-4 animate-slideIn" style={{animationDelay: "0.1s"}}>
-              <div className={`p-3 rounded-xl h-fit ${
-                isDarkMode ? "bg-purple-600/20" : "bg-purple-100"
-              }`}>
-                <Rocket className={`w-6 h-6 ${
-                  isDarkMode ? "text-purple-400" : "text-purple-600"
-                }`} />
+          <h1 className="text-[64px] font-[850] text-white leading-[1.05] mb-8 tracking-[-0.03em]">
+            Create Your Account<br />
+            & Start Captioning<br />
+            with <span className="text-[#14f1d9]">AI</span>
+          </h1>
+
+          <p className="text-slate-400 text-[17px] leading-relaxed mb-14 max-w-lg font-medium opacity-80">
+            Join thousands of creators who use AI Captioner to generate
+            smart, engaging captions for their images. It's free to get started —
+            no credit card required.
+          </p>
+
+          <div className="space-y-10">
+            {/* Feature 1 */}
+            <div className="flex gap-6 group">
+              <div className="flex-shrink-0 w-[52px] h-[52px] flex items-center justify-center rounded-2xl bg-[#14f1d9]/10 border border-[#14f1d9]/20 group-hover:bg-[#14f1d9]/20 transition-all duration-300">
+                <UserCheck className="w-6 h-6 text-[#14f1d9]" />
               </div>
-              <div>
-                <h3 className={`text-xl font-bold mb-1 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>Get Started Instantly</h3>
-                <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  Sign up in seconds and start using AI captions immediately
+              <div className="flex flex-col justify-center">
+                <h3 className="text-white font-bold text-[17px] mb-1 group-hover:text-[#14f1d9] transition-colors duration-300">
+                  Free Account, No Card Needed
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                  Sign up in seconds and start captioning images right away.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-4 animate-slideIn" style={{animationDelay: "0.2s"}}>
-              <div className={`p-3 rounded-xl h-fit ${
-                isDarkMode ? "bg-pink-600/20" : "bg-pink-100"
-              }`}>
-                <Palette className={`w-6 h-6 ${
-                  isDarkMode ? "text-pink-400" : "text-pink-600"
-                }`} />
+            {/* Feature 2 */}
+            <div className="flex gap-6 group">
+              <div className="flex-shrink-0 w-[52px] h-[52px] flex items-center justify-center rounded-2xl bg-[#14f1d9]/10 border border-[#14f1d9]/20 group-hover:bg-[#14f1d9]/20 transition-all duration-300">
+                <Layers className="w-6 h-6 text-[#14f1d9]" />
               </div>
-              <div>
-                <h3 className={`text-xl font-bold mb-1 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>Customizable Styles</h3>
-                <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  Choose from multiple caption styles to match your brand
+              <div className="flex flex-col justify-center">
+                <h3 className="text-white font-bold text-[17px] mb-1 group-hover:text-[#14f1d9] transition-colors duration-300">
+                  Unlimited Caption Styles
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                  Choose from professional, funny, poetic, and many more tones.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-4 animate-slideIn" style={{animationDelay: "0.3s"}}>
-              <div className={`p-3 rounded-xl h-fit ${
-                isDarkMode ? "bg-blue-600/20" : "bg-blue-100"
-              }`}>
-                <Zap className={`w-6 h-6 ${
-                  isDarkMode ? "text-blue-400" : "text-blue-600"
-                }`} />
+            {/* Feature 3 */}
+            <div className="flex gap-6 group">
+              <div className="flex-shrink-0 w-[52px] h-[52px] flex items-center justify-center rounded-2xl bg-[#14f1d9]/10 border border-[#14f1d9]/20 group-hover:bg-[#14f1d9]/20 transition-all duration-300">
+                <Globe className="w-6 h-6 text-[#14f1d9]" />
               </div>
-              <div>
-                <h3 className={`text-xl font-bold mb-1 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>Super Fast Processing</h3>
-                <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  Get AI-generated captions in less than a second
+              <div className="flex flex-col justify-center">
+                <h3 className="text-white font-bold text-[17px] mb-1 group-hover:text-[#14f1d9] transition-colors duration-300">
+                  Multi-Language Support
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                  Generate captions in English, Hindi, and other languages.
                 </p>
               </div>
             </div>
 
-            <div className="flex gap-4 animate-slideIn" style={{animationDelay: "0.4s"}}>
-              <div className={`p-3 rounded-xl h-fit ${
-                isDarkMode ? "bg-green-600/20" : "bg-green-100"
-              }`}>
-                <Users className={`w-6 h-6 ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`} />
+            {/* Feature 4 */}
+            <div className="flex gap-6 group">
+              <div className="flex-shrink-0 w-[52px] h-[52px] flex items-center justify-center rounded-2xl bg-[#14f1d9]/10 border border-[#14f1d9]/20 group-hover:bg-[#14f1d9]/20 transition-all duration-300">
+                <Rocket className="w-6 h-6 text-[#14f1d9]" />
               </div>
-              <div>
-                <h3 className={`text-xl font-bold mb-1 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>Community Support</h3>
-                <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
-                  Join our active community and get help whenever you need it
+              <div className="flex flex-col justify-center">
+                <h3 className="text-white font-bold text-[17px] mb-1 group-hover:text-[#14f1d9] transition-colors duration-300">
+                  Built for Creators & Developers
+                </h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
+                  Perfect for social media, blogs, and app integrations.
                 </p>
               </div>
             </div>
-          </div>
-
-          {/* Testimonial */}
-          <div className={`p-6 rounded-2xl ${
-            isDarkMode ? "bg-gray-800/50 border border-gray-700/50" : "bg-white/50 border border-white/60"
-          } backdrop-blur-xl animate-fadeIn`} style={{animationDelay: "0.5s"}}>
-            <p className={`text-lg font-medium mb-3 ${isDarkMode ? "text-white" : "text-gray-900"}`}>
-              "AI Captioner saved me hours of manual work!"
-            </p>
-            <p className={`${isDarkMode ? "text-gray-400" : "text-gray-600"} text-sm`}>
-              ⭐⭐⭐⭐⭐ - Sarah, Content Creator
-            </p>
           </div>
         </div>
 
-        {/* RIGHT SIDE - Signup Form */}
-        <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-4 lg:px-12">
-          {/* Top Navigation for Mobile */}
-          <div className="lg:hidden w-full flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
-              <div className={`p-2 rounded-xl ${
-                isDarkMode ? "bg-purple-600/20" : "bg-purple-100"
-              }`}>
-                <Sparkles className={`w-5 h-5 ${
-                  isDarkMode ? "text-purple-400" : "text-purple-600"
-                }`} />
-              </div>
-              <div>
-                <h1 className={`text-lg font-bold ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>AI Captioner</h1>
-              </div>
-            </div>
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              className={`p-2 rounded-xl transition-all ${
-                isDarkMode
-                  ? "hover:bg-gray-700/50 text-yellow-400"
-                  : "hover:bg-purple-100 text-purple-600"
-              }`}
-            >
-              {isDarkMode ? "☀️" : "🌙"}
-            </button>
+        {/* Footer - Process Steps */}
+        <div className="flex items-center gap-5 mt-auto pt-10 border-t border-slate-800/40 relative z-10">
+          <div className="flex items-center gap-3 py-2 px-5 rounded-full bg-[#14f1d9]/10 border border-[#14f1d9]/30">
+            <Mail className="w-[18px] h-[18px] text-[#14f1d9]" />
+            <span className="text-[#14f1d9] text-[11px] font-[800] uppercase tracking-wider">Sign Up</span>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-700 font-bold" />
+          <div className="flex items-center gap-3 py-2 px-5 rounded-full bg-slate-900/40 border border-slate-800 transition-all hover:bg-slate-900">
+            <CheckCircle2 className="w-[18px] h-[18px] text-slate-500" />
+            <span className="text-slate-500 text-[11px] font-[800] uppercase tracking-wider">Verify</span>
+          </div>
+          <ArrowRight className="w-4 h-4 text-slate-700 font-bold" />
+          <div className="flex items-center gap-3 py-2 px-5 rounded-full bg-slate-900/40 border border-slate-800 transition-all hover:bg-slate-900">
+            <Sparkles className="w-[18px] h-[18px] text-slate-500" />
+            <span className="text-slate-500 text-[11px] font-[800] uppercase tracking-wider">Start Creating</span>
+          </div>
+        </div>
+      </div>
+
+      {/* RIGHT SIDE - Signup Form */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-6 lg:px-24 py-16 relative">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#14f1d9]/5 rounded-full blur-[140px] pointer-events-none"></div>
+
+        <div className="w-full max-w-lg bg-[#0f172a]/70 backdrop-blur-2xl border border-slate-800/80 p-12 rounded-[32px] shadow-2xl relative z-10 overflow-hidden group transition-all duration-500 hover:border-[#14f1d9]/20">
+          {/* Subtle highlight border effect */}
+          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#14f1d9]/20 to-transparent"></div>
+
+          <div className="mb-10 text-center lg:text-left">
+            <h2 className="text-[34px] font-[800] text-white mb-3 tracking-[-0.02em]">
+              Create Your Account
+            </h2>
+            <p className="text-slate-400/90 text-[15px] font-medium leading-relaxed">
+              Join AI Captioner and start generating captions instantly.
+            </p>
           </div>
 
-          {/* Signup Card */}
-          <div
-            className={`w-full max-w-md backdrop-blur-xl rounded-3xl p-8 shadow-2xl border transition-all duration-300 ${
-              isDarkMode
-                ? "bg-gray-800/70 border-gray-600/50"
-                : "bg-white/80 border-white/60"
-            }`}
-          >
-            {/* Header */}
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h2 className={`text-3xl font-bold mb-2 ${
-                  isDarkMode ? "text-white" : "text-gray-900"
-                }`}>Create Account</h2>
-                <p className={`text-base ${
-                  isDarkMode ? "text-gray-400" : "text-gray-600"
-                }`}>Join our community</p>
-              </div>
-              <button
-                onClick={() => setIsDarkMode(!isDarkMode)}
-                className={`hidden lg:block p-3 rounded-xl transition-all ${
-                  isDarkMode
-                    ? "hover:bg-gray-700/50 text-yellow-400"
-                    : "hover:bg-purple-100 text-purple-600"
-                }`}
-              >
-                {isDarkMode ? "☀️" : "🌙"}
-              </button>
+          {error && (
+            <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 animate-fadeIn">
+              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+              <p className="text-sm text-red-100 font-semibold">{error}</p>
+            </div>
+          )}
+
+          {success && (
+            <div className="mb-8 p-4 bg-[#14f1d9]/10 border border-[#14f1d9]/20 rounded-2xl flex items-center gap-3 animate-fadeIn">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#14f1d9]"></div>
+              <p className="text-sm text-[#14f1d9] font-semibold">{success}</p>
+            </div>
+          )}
+
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div className="space-y-2.5">
+              <label className="text-[14px] font-[700] text-slate-300/90 ml-1">
+                Full Name
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="John Doe"
+                className="w-full px-6 py-4 rounded-xl bg-[#0f172a]/80 border border-slate-800 text-white placeholder-slate-600 outline-none transition-all focus:border-[#14f1d9]/50 focus:ring-1 focus:ring-[#14f1d9]/20 font-medium"
+              />
             </div>
 
-            {/* Error Message */}
-            {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl backdrop-blur-sm animate-shake">
-                <p className={`text-sm font-medium ${
-                  isDarkMode ? "text-red-400" : "text-red-600"
-                }`}>{error}</p>
-              </div>
-            )}
+            <div className="space-y-2.5">
+              <label className="text-[14px] font-[700] text-slate-300/90 ml-1">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-6 py-4 rounded-xl bg-[#0f172a]/80 border border-slate-800 text-white placeholder-slate-600 outline-none transition-all focus:border-[#14f1d9]/50 focus:ring-1 focus:ring-[#14f1d9]/20 font-medium"
+              />
+            </div>
 
-            {/* Success Message */}
-            {success && (
-              <div className="mb-6 p-4 bg-green-500/10 border border-green-500/50 rounded-xl backdrop-blur-sm flex items-center gap-2 animate-bounce">
-                <Check className={`w-5 h-5 ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`} />
-                <p className={`text-sm font-medium ${
-                  isDarkMode ? "text-green-400" : "text-green-600"
-                }`}>{success}</p>
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSignup} className="space-y-6">
-              {/* Username */}
-              <div className="space-y-2">
-                <label
-                  className={`block text-sm font-semibold ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
-                  }`}
-                >
-                  Username
-                </label>
-                <div className="relative group">
-                  <div className={`absolute left-3 top-3.5 transition-colors ${
-                    isDarkMode ? "text-gray-600 group-focus-within:text-purple-400" : "text-gray-400 group-focus-within:text-purple-500"
-                  }`}>
-                    <Mail className="w-5 h-5" />
-                  </div>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    className={`w-full pl-11 pr-4 py-3 rounded-xl border-2 transition-all focus:outline-none ${
-                      isDarkMode
-                        ? "bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-500 focus:border-purple-500 focus:bg-gray-700/80"
-                        : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:bg-white"
-                    }`}
-                    placeholder="choose_username"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-2">
-                <label
-                  className={`block text-sm font-semibold ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
-                  }`}
-                >
-                  Password
-                </label>
-                <div className="relative group">
-                  <div className={`absolute left-3 top-3.5 transition-colors ${
-                    isDarkMode ? "text-gray-600 group-focus-within:text-purple-400" : "text-gray-400 group-focus-within:text-purple-500"
-                  }`}>
-                    <Lock className="w-5 h-5" />
-                  </div>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full pl-11 pr-11 py-3 rounded-xl border-2 transition-all focus:outline-none ${
-                      isDarkMode
-                        ? "bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-500 focus:border-purple-500 focus:bg-gray-700/80"
-                        : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:bg-white"
-                    }`}
-                    placeholder="Min 6 characters"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className={`absolute right-3 top-3.5 transition-colors ${
-                      isDarkMode ? "text-gray-600 hover:text-gray-400" : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    {showPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Confirm Password */}
-              <div className="space-y-2">
-                <label
-                  className={`block text-sm font-semibold ${
-                    isDarkMode ? "text-gray-200" : "text-gray-700"
-                  }`}
-                >
-                  Confirm Password
-                </label>
-                <div className="relative group">
-                  <div className={`absolute left-3 top-3.5 transition-colors ${
-                    isDarkMode ? "text-gray-600 group-focus-within:text-purple-400" : "text-gray-400 group-focus-within:text-purple-500"
-                  }`}>
-                    <Lock className="w-5 h-5" />
-                  </div>
-                  <input
-                    type={showConfirmPassword ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full pl-11 pr-11 py-3 rounded-xl border-2 transition-all focus:outline-none ${
-                      isDarkMode
-                        ? "bg-gray-700/50 border-gray-600/50 text-white placeholder-gray-500 focus:border-purple-500 focus:bg-gray-700/80"
-                        : "bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:border-purple-500 focus:bg-white"
-                    }`}
-                    placeholder="Confirm password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className={`absolute right-3 top-3.5 transition-colors ${
-                      isDarkMode ? "text-gray-600 hover:text-gray-400" : "text-gray-400 hover:text-gray-600"
-                    }`}
-                  >
-                    {showConfirmPassword ? (
-                      <EyeOff className="w-5 h-5" />
-                    ) : (
-                      <Eye className="w-5 h-5" />
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full px-6 py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 mt-8 ${
-                  loading
-                    ? "opacity-60 cursor-not-allowed"
-                    : "hover:shadow-lg hover:scale-[1.02] active:scale-95"
-                } bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-md`}
-              >
-                {loading ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    <span>Creating account...</span>
-                  </>
-                ) : (
-                  <>
-                    <span>Create Account</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </form>
-
-            {/* Switch to Login */}
-            <div className={`mt-8 pt-6 border-t ${
-              isDarkMode ? "border-gray-700/50" : "border-gray-200/50"
-            } text-center text-sm`}>
-              <p className={isDarkMode ? "text-gray-400" : "text-gray-600"}>
-                Already have an account?{" "}
+            <div className="space-y-2.5">
+              <label className="text-[14px] font-[700] text-slate-300/90 ml-1">
+                Password
+              </label>
+              <div className="relative group">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-6 py-4 rounded-xl bg-[#0f172a]/80 border border-slate-800 text-white placeholder-slate-600 outline-none transition-all focus:border-[#14f1d9]/50 focus:ring-1 focus:ring-[#14f1d9]/20 font-medium"
+                />
                 <button
-                  onClick={() => navigate("/login")}
-                  className="text-transparent bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text font-bold hover:opacity-80 transition-opacity"
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hover:text-[#14f1d9] transition-colors duration-300"
                 >
-                  Sign In
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
-              </p>
+              </div>
             </div>
-          </div>
 
-          {/* Footer */}
-          <p className={`text-center text-xs mt-8 ${
-            isDarkMode ? "text-gray-500" : "text-gray-600"
-          }`}>
-            Made with 💻✨ by Isha | Powered by Google Gemini AI
+            <div className="space-y-2.5">
+              <label className="text-[14px] font-[700] text-slate-300/90 ml-1">
+                Confirm Password
+              </label>
+              <div className="relative group">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-6 py-4 rounded-xl bg-[#0f172a]/80 border border-slate-800 text-white placeholder-slate-600 outline-none transition-all focus:border-[#14f1d9]/50 focus:ring-1 focus:ring-[#14f1d9]/20 font-medium"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500 hover:text-[#14f1d9] transition-colors duration-300"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-[18px] rounded-2xl bg-[#14f1d9] hover:bg-[#0ee7ce] text-[#020617] font-extrabold text-[17px] flex items-center justify-center gap-3 mt-6 shadow-2xl shadow-[#14f1d9]/20 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+            >
+              {loading ? (
+                <div className="w-6 h-6 border-[3px] border-[#020617] border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <span className="mb-0.5">Sign Up</span>
+                  <ArrowRight className="w-5 h-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                </>
+              )}
+            </button>
+          </form>
+
+          <p className="text-center text-slate-400 text-[15px] font-medium mt-10">
+            Already have an account?{" "}
+            <button
+              onClick={() => navigate("/login")}
+              className="text-[#14f1d9] hover:text-[#0ee7ce] font-extrabold transition-all ml-1 underline-offset-[6px] hover:underline"
+            >
+              Login
+            </button>
           </p>
         </div>
       </div>
