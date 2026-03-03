@@ -172,6 +172,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
     const [captionHistory, setCaptionHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
     const fileInputRef = useRef(null);
+    const uploadedFileRef = useRef(null); // store last uploaded file for regeneration
 
     const captionStyles = [
         { id: "casual", label: "Casual", icon: <Smile className="w-4 h-4" /> },
@@ -189,41 +190,42 @@ const ImageCaptioner = ({ onLogout, user }) => {
     const handleFile = async (file) => {
         if (!file || !file.type.startsWith("image/")) { showToast("Please upload a valid image file", "error"); return; }
         if (file.size > 10 * 1024 * 1024) { showToast("File must be under 10MB", "error"); return; }
+        uploadedFileRef.current = file; // save for regeneration
         setPreviewUrl(URL.createObjectURL(file));
         setCaption("");
         setIsGenerating(true);
         try {
             const formData = new FormData();
             formData.append("image", file);
+            formData.append("tone", captionStyle); // send selected tone
             const res = await axios.post("http://localhost:3000/api/posts", formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast("Caption generated! ✨");
-            if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: "auto", timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
+            if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
         } catch (err) {
             showToast(err.response?.data?.message || "Upload failed. Try again.", "error");
             setPreviewUrl(null);
         } finally { setIsGenerating(false); }
     };
 
-    const generateCaption = () => {
-        if (!previewUrl) return;
+    // Regenerate with the selected tone using the same image
+    const generateCaption = async () => {
+        if (!uploadedFileRef.current) { showToast("Please upload an image first", "error"); return; }
         setIsGenerating(true);
         setCaption("");
-        const samples = {
-            casual: "Just another golden hour 🌅\n* Some moments are too good to keep to yourself.\n* Golden hour hits different every time.\n* Living for these vibes. ✨ #VibeCheck",
-            funny: "Me: 'I won't take many photos today.'\n* Also me: 📸📸📸\n* IYKYK 😅\n* My camera roll doesn't lie. #Relatable",
-            professional: "**Visual Storytelling**\n* Capturing excellence in every frame.\n* Elevating the art of content creation.\n* Where creativity meets precision. #ContentCreation",
-            poetic: "**Golden Hour Musings**\n* In quiet spaces between light and shadow, time holds its breath. ✨\n* Light that whispers secrets only the lens can hear.\n* A moment frozen, yet forever alive. #NaturePoetry",
-            hashtags: "Living my best life ✨\n* #Photography\n* #Aesthetic\n* #Vibes\n* #ContentCreator\n* #Trending\n* #Explore",
-        };
-        setTimeout(() => {
-            const gen = samples[captionStyle];
+        try {
+            const formData = new FormData();
+            formData.append("image", uploadedFileRef.current);
+            formData.append("tone", captionStyle); // send the newly selected tone
+            const res = await axios.post("http://localhost:3000/api/posts", formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
+            const gen = res.data?.post?.caption || "";
             setCaption(gen);
-            setIsGenerating(false);
-            showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready!`);
-            setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
-        }, 1800);
+            showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready! ✨`);
+            if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
+        } catch (err) {
+            showToast(err.response?.data?.message || "Generation failed. Try again.", "error");
+        } finally { setIsGenerating(false); }
     };
 
     return (
