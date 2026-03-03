@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { ArrowRight, Sparkles, Zap, Upload, Image, Copy, Wand2, Globe, Shield, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../components/Logo";
+import Footer from "../components/Footer";
 
 const T = {
   bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
@@ -198,12 +199,7 @@ const Home = () => {
       </section>
 
       {/* ══ FOOTER ══════════════════════════════════════════════ */}
-      <footer className="py-20 px-8 border-t" style={{ borderColor: T.border }}>
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Logo size={32} />
-          <p className="text-sm font-bold opacity-30">© 2026 SnapScript by Isha Singh</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -6,6 +6,7 @@ import {
     History, Image as ImageIcon, Smile, Laugh, Briefcase,
     Theater, Hash, CheckCircle2, ChevronDown, Trash2
 } from "lucide-react";
+import Footer from "../components/Footer";
 
 const T = {
     bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
@@ -464,6 +465,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
                     </div>
                 </div>
             </main>
+            <Footer />
         </div>
     );
 };
