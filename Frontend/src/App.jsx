@@ -60,8 +60,11 @@ const App = () => {
             <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderTopColor: "transparent", borderColor: "#c4956a #c4956a #c4956a transparent" }}></div>
           </div>
           <div className="flex items-center gap-2.5 justify-center">
-            <div className="w-7 h-7 rounded-xl flex items-center justify-center" style={{ background: "#1a1a1a" }}>
-              <svg className="w-4 h-4 fill-current" style={{ color: "#c4956a" }} viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-xl animate-pulse" style={{ background: "#1a1a1a" }}>
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 20Q15 5 20 20T30 20" stroke="#c4956a" strokeWidth="5" strokeLinecap="round" />
+                <path d="M15 25Q20 10 25 25T35 25" stroke="rgba(255,255,255,0.2)" strokeWidth="5" strokeLinecap="round" />
+              </svg>
             </div>
             <span className="font-black text-xl tracking-tight" style={{ color: "#1a1a1a" }}>
               Snap<span style={{ color: "#c4956a" }}>Script</span>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { Eye, EyeOff, ArrowRight, Zap, ChevronLeft, Mail, Lock, Upload, Wand2, Sparkles, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 
 const T = {
   bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
@@ -59,15 +60,7 @@ const Login = ({ onLoginSuccess }) => {
         {/* LEFT — Brand storytelling */}
         <div className="hidden lg:block">
           {/* Logo */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center"
-              style={{ background: T.dark }}>
-              <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
-            </div>
-            <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>
-              Snap<span style={{ color: T.accent }}>Script</span>
-            </span>
-          </div>
+          <Logo textVisible={false} size={44} />
 
           {/* Status badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-[11px] font-black uppercase tracking-widest mb-6"

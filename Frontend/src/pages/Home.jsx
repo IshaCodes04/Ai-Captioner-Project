@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { ArrowRight, Sparkles, Zap, Upload, Image, Copy, Wand2, Globe, Shield, CheckCircle2, Play } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import Logo from "../components/Logo";
 
 /* ── Brand tokens ─────────────────────────────── */
 const T = {
@@ -41,11 +42,8 @@ const Home = () => {
       {/* ══ NAVBAR ══════════════════════════════════════════════ */}
       <nav className={`fixed top-0 w-full z-[100] transition-all duration-500 ${scrolled ? "bg-white/90 backdrop-blur-xl shadow-sm border-b border-[#e8e0d5]" : ""}`}>
         <div className="max-w-7xl mx-auto px-8 h-20 flex justify-between items-center">
-          <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate("/home")}>
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style={{ background: T.dark }}>
-              <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
-            </div>
-            <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
+          <div className="cursor-pointer" onClick={() => navigate("/home")}>
+            <Logo />
           </div>
 
           <div className="hidden md:flex items-center gap-9">
@@ -277,12 +275,7 @@ const Home = () => {
       {/* ══ FOOTER ══════════════════════════════════════════════ */}
       <footer className="py-14 px-8 border-t" style={{ borderColor: T.border }}>
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: T.dark }}>
-              <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
-            </div>
-            <span className="text-lg font-black" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
-          </div>
+          <Logo size={32} />
           <div className="flex gap-8">
             {["Privacy", "Terms", "Twitter", "GitHub", "Contact"].map(l => (
               <a key={l} href="#" className="text-sm font-medium transition-colors" style={{ color: T.muted }} onMouseEnter={e => e.target.style.color = T.accent} onMouseLeave={e => e.target.style.color = T.muted}>{l}</a>
