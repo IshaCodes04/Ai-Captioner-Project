@@ -13,6 +13,154 @@ const T = {
     accentHover: "#b5845a", border: "#e8e0d5",
 };
 
+// ─── Markdown Parser ────────────────────────────────────────────────
+// Converts AI output like **Section:** * bullet into structured data
+const parseCaptionMarkdown = (text) => {
+    const sections = [];
+    const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+    let currentSection = null;
+
+    for (const line of lines) {
+        const headerMatch = line.match(/^\*\*(.+?)\*\*:?\s*(.*)$/);
+        if (headerMatch) {
+            if (currentSection) sections.push(currentSection);
+            currentSection = { title: headerMatch[1].replace(/:$/, ""), bullets: [] };
+            const rest = headerMatch[2].trim();
+            if (rest) currentSection.bullets.push(rest);
+        } else if (/^[\*•\-]\s+/.test(line)) {
+            const bullet = line.replace(/^[\*•\-]\s+/, "").trim();
+            if (bullet) {
+                if (!currentSection) currentSection = { title: null, bullets: [] };
+                currentSection.bullets.push(bullet);
+            }
+        } else {
+            if (!currentSection) currentSection = { title: null, bullets: [] };
+            if (line.length > 3) currentSection.bullets.push(line);
+        }
+    }
+    if (currentSection) sections.push(currentSection);
+    return sections.filter(s => s.bullets.length > 0);
+};
+
+// ─── Single Caption Bullet Row ───────────────────────────────────────
+const CaptionBullet = ({ text, T }) => {
+    const [copiedItem, setCopiedItem] = useState(false);
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setCopiedItem(true);
+            setTimeout(() => setCopiedItem(false), 2000);
+        } catch { }
+    };
+
+    return (
+        <div
+            className="flex items-start gap-3 px-4 py-3 rounded-2xl border group transition-all"
+            style={{ background: T.surface, borderColor: T.border }}
+        >
+            {/* Bullet dot */}
+            <span className="mt-1.5 w-2 h-2 rounded-full flex-shrink-0" style={{ background: T.accent }} />
+
+            {/* Caption text */}
+            <p className="flex-1 text-sm leading-relaxed font-medium" style={{ color: T.mid }}>
+                {text}
+            </p>
+
+            {/* Copy button */}
+            <button
+                onClick={handleCopy}
+                title="Copy this caption"
+                className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all active:scale-95"
+                style={
+                    copiedItem
+                        ? { background: "rgba(52,211,153,0.12)", color: "#059669", border: "1px solid rgba(52,211,153,0.25)" }
+                        : { background: "white", color: T.muted, border: `1px solid ${T.border}` }
+                }
+                onMouseEnter={e => { if (!copiedItem) { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; } }}
+                onMouseLeave={e => { if (!copiedItem) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; } }}
+            >
+                {copiedItem ? <><CheckCircle2 className="w-3.5 h-3.5" /> Done</> : <><Copy className="w-3.5 h-3.5" /> Copy</>}
+            </button>
+        </div>
+    );
+};
+
+// ─── Full Caption Output Block ────────────────────────────────────────
+const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
+    const [copiedAll, setCopiedAll] = useState(false);
+    const sections = parseCaptionMarkdown(caption);
+
+    const copyAll = async () => {
+        try {
+            await navigator.clipboard.writeText(caption);
+            setCopiedAll(true);
+            setTimeout(() => setCopiedAll(false), 2500);
+        } catch { }
+    };
+
+    // If parsing produced nothing meaningful, fall back to raw display
+    const hasStructure = sections.length > 0 && sections.some(s => s.bullets.length > 0);
+
+    return (
+        <div className="animate-fadeUp w-full">
+            {/* Captions list */}
+            <div className="space-y-6 mb-6 max-h-[360px] overflow-y-auto pr-1" style={{ scrollbarWidth: "thin" }}>
+                {hasStructure ? (
+                    sections.map((section, si) => (
+                        <div key={si}>
+                            {section.title && (
+                                <p className="text-[11px] font-black uppercase tracking-widest mb-2 px-1" style={{ color: T.accent }}>
+                                    {section.title}
+                                </p>
+                            )}
+                            <div className="space-y-2">
+                                {section.bullets.map((bullet, bi) => (
+                                    <CaptionBullet key={bi} text={bullet} T={T} />
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                ) : (
+                    // Fallback: show raw caption as single bullet
+                    <CaptionBullet text={caption} T={T} />
+                )}
+            </div>
+
+            {/* Bottom action row */}
+            <div className="flex gap-3">
+                <button
+                    onClick={copyAll}
+                    className="flex-1 flex items-center justify-center gap-2.5 py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
+                    style={
+                        copiedAll
+                            ? { background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "#059669" }
+                            : { background: T.dark, color: "white" }
+                    }
+                    onMouseEnter={e => { if (!copiedAll) e.currentTarget.style.background = T.accent; }}
+                    onMouseLeave={e => { if (!copiedAll) e.currentTarget.style.background = T.dark; }}
+                >
+                    {copiedAll
+                        ? <><CheckCircle2 className="w-5 h-5" /> All Copied!</>
+                        : <><Copy className="w-5 h-5" /> Copy All</>}
+                </button>
+
+                <button
+                    onClick={onRegenerateClick}
+                    className="w-16 h-16 flex items-center justify-center rounded-2xl border transition-all group/re"
+                    style={{ background: T.surface, borderColor: T.border, color: T.muted }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; }}
+                    title="Regenerate"
+                >
+                    <RefreshCw className="w-5 h-5 group-hover/re:rotate-180 transition-transform duration-500" />
+                </button>
+            </div>
+        </div>
+    );
+};
+
+// ─── Main Component ───────────────────────────────────────────────────
 const ImageCaptioner = ({ onLogout, user }) => {
     const navigate = useNavigate();
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -23,7 +171,6 @@ const ImageCaptioner = ({ onLogout, user }) => {
     const [dragOver, setDragOver] = useState(false);
     const [captionHistory, setCaptionHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
-    const [copied, setCopied] = useState(false);
     const fileInputRef = useRef(null);
 
     const captionStyles = [
@@ -64,11 +211,11 @@ const ImageCaptioner = ({ onLogout, user }) => {
         setIsGenerating(true);
         setCaption("");
         const samples = {
-            casual: "Just another golden hour 🌅 Some moments are too good to keep to yourself. #VibeCheck",
-            funny: "Me: 'I won't take many photos today.' Also me: 📸📸📸 IYKYK 😅 #Relatable",
-            professional: "Capturing excellence in every frame. Visual storytelling at its finest. #ContentCreation",
-            poetic: "In quiet spaces between light and shadow, time holds its breath. ✨ #NaturePoetry",
-            hashtags: "Living my best life ✨ #Photography #Aesthetic #Vibes #ContentCreator #Trending #Explore",
+            casual: "Just another golden hour 🌅\n* Some moments are too good to keep to yourself.\n* Golden hour hits different every time.\n* Living for these vibes. ✨ #VibeCheck",
+            funny: "Me: 'I won't take many photos today.'\n* Also me: 📸📸📸\n* IYKYK 😅\n* My camera roll doesn't lie. #Relatable",
+            professional: "**Visual Storytelling**\n* Capturing excellence in every frame.\n* Elevating the art of content creation.\n* Where creativity meets precision. #ContentCreation",
+            poetic: "**Golden Hour Musings**\n* In quiet spaces between light and shadow, time holds its breath. ✨\n* Light that whispers secrets only the lens can hear.\n* A moment frozen, yet forever alive. #NaturePoetry",
+            hashtags: "Living my best life ✨\n* #Photography\n* #Aesthetic\n* #Vibes\n* #ContentCreator\n* #Trending\n* #Explore",
         };
         setTimeout(() => {
             const gen = samples[captionStyle];
@@ -77,12 +224,6 @@ const ImageCaptioner = ({ onLogout, user }) => {
             showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready!`);
             setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
         }, 1800);
-    };
-
-    const copyCaption = async () => {
-        if (!caption) return;
-        try { await navigator.clipboard.writeText(caption); setCopied(true); showToast("Copied! 🎉"); setTimeout(() => setCopied(false), 2500); }
-        catch { showToast("Failed to copy", "error"); }
     };
 
     return (
@@ -217,7 +358,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
                     {/* OUTPUT */}
                     <div className="flex flex-col gap-6">
                         <div className="flex-grow rounded-3xl p-8 border flex flex-col min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
-                            <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2.5">
                                     <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
                                         <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
@@ -238,34 +379,18 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                         </div>
                                         <div>
                                             <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Analyzing image...</p>
-                                            <p className="font-medium text-sm" style={{ color: T.muted }}>AI is reading the scene, mood & context</p>
+                                            <p className="font-medium text-sm" style={{ color: T.muted }}>AI is reading the scene, mood &amp; context</p>
                                         </div>
                                         <div className="flex gap-2">
                                             {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: T.accent, animationDelay: `${i * 0.15}s` }}></div>)}
                                         </div>
                                     </div>
                                 ) : caption ? (
-                                    <div className="animate-fadeUp">
-                                        <div className="rounded-2xl p-6 mb-6 border" style={{ background: T.surface, borderColor: T.border }}>
-                                            <p className="leading-relaxed font-medium italic" style={{ color: T.mid }}>"{caption}"</p>
-                                        </div>
-                                        <div className="flex gap-3">
-                                            <button onClick={copyCaption}
-                                                className="flex-1 flex items-center justify-center gap-2.5 py-4 rounded-2xl font-black text-base transition-all active:scale-[0.98]"
-                                                style={copied ? { background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "#059669" } : { background: T.dark, color: "white" }}
-                                                onMouseEnter={e => { if (!copied) e.currentTarget.style.background = T.accent; }}
-                                                onMouseLeave={e => { if (!copied) e.currentTarget.style.background = T.dark; }}
-                                            >
-                                                {copied ? <><CheckCircle2 className="w-5 h-5" /> Copied!</> : <><Copy className="w-5 h-5" /> Copy Caption</>}
-                                            </button>
-                                            <button onClick={generateCaption} className="w-16 h-16 flex items-center justify-center rounded-2xl border transition-all group/re"
-                                                style={{ background: T.surface, borderColor: T.border, color: T.muted }}
-                                                onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; }}
-                                                onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; }}>
-                                                <RefreshCw className="w-5 h-5 group-hover/re:rotate-180 transition-transform duration-500" />
-                                            </button>
-                                        </div>
-                                    </div>
+                                    <CaptionOutput
+                                        caption={caption}
+                                        T={T}
+                                        onRegenerateClick={generateCaption}
+                                    />
                                 ) : (
                                     <div className="flex flex-col items-center gap-4 py-12 text-center opacity-40">
                                         <Sparkles className="w-16 h-16 animate-float" style={{ color: T.border }} />
