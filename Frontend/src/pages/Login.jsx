@@ -65,7 +65,7 @@ const Login = ({ onLoginSuccess }) => {
               <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
             </div>
             <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>
-              Caption<span style={{ color: T.accent }}>AI</span>
+              Snap<span style={{ color: T.accent }}>Script</span>
             </span>
           </div>
 
@@ -79,7 +79,7 @@ const Login = ({ onLoginSuccess }) => {
           {/* Headline */}
           <h1 className="text-[52px] font-black leading-[0.94] tracking-[-0.035em] mb-5"
             style={{ color: T.dark }}>
-            Welcome<br />Back to<br /><span style={{ color: T.accent }}>CaptionAI</span>
+            Welcome<br />Back to<br /><span style={{ color: T.accent }}>SnapScript</span>
           </h1>
 
           <p className="text-[15px] leading-relaxed font-medium mb-8 max-w-[320px]" style={{ color: T.mid }}>
@@ -184,7 +184,7 @@ const Login = ({ onLoginSuccess }) => {
                 onMouseLeave={e => e.currentTarget.style.background = T.dark}>
                 {loading
                   ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  : <><ArrowRight className="w-4 h-4" /> Sign In to CaptionAI</>}
+                  : <><ArrowRight className="w-4 h-4" /> Sign In to SnapScript</>}
               </button>
             </form>
 
@@ -196,7 +196,7 @@ const Login = ({ onLoginSuccess }) => {
             </div>
 
             <p className="text-center text-[13px] font-medium" style={{ color: T.muted }}>
-              New to CaptionAI?{" "}
+              New to SnapScript?{" "}
               <button onClick={() => navigate("/signup")} className="font-black transition-colors"
                 style={{ color: T.accent }}
                 onMouseEnter={e => e.target.style.color = T.accentHover}

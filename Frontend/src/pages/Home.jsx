@@ -45,7 +45,7 @@ const Home = () => {
             <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow-md" style={{ background: T.dark }}>
               <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
             </div>
-            <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>Caption<span style={{ color: T.accent }}>AI</span></span>
+            <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
           </div>
 
           <div className="hidden md:flex items-center gap-9">
@@ -177,7 +177,7 @@ const Home = () => {
       <section id="features" className="py-32 px-8 border-t" style={{ borderColor: T.border }}>
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <p className="text-xs font-black uppercase tracking-[0.3em] mb-5" style={{ color: T.accent }}>Why CaptionAI?</p>
+            <p className="text-xs font-black uppercase tracking-[0.3em] mb-5" style={{ color: T.accent }}>Why SnapScript?</p>
             <h2 className="text-5xl font-black tracking-tight mb-6" style={{ color: T.dark }}>
               Everything creators need,<br /><span style={{ color: T.accent }}>nothing they don't</span>
             </h2>
@@ -281,7 +281,7 @@ const Home = () => {
             <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: T.dark }}>
               <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
             </div>
-            <span className="text-lg font-black" style={{ color: T.dark }}>Caption<span style={{ color: T.accent }}>AI</span></span>
+            <span className="text-lg font-black" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
           </div>
           <div className="flex gap-8">
             {["Privacy", "Terms", "Twitter", "GitHub", "Contact"].map(l => (

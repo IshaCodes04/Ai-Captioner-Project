@@ -250,7 +250,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow" style={{ background: T.dark }}>
                             <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
                         </div>
-                        <span className="text-lg font-black tracking-tight" style={{ color: T.dark }}>Caption<span style={{ color: T.accent }}>AI</span></span>
+                        <span className="text-lg font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
                     </div>
 
                     <div className="flex items-center gap-6">

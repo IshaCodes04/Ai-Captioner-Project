@@ -64,7 +64,7 @@ const App = () => {
               <svg className="w-4 h-4 fill-current" style={{ color: "#c4956a" }} viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
             </div>
             <span className="font-black text-xl tracking-tight" style={{ color: "#1a1a1a" }}>
-              Caption<span style={{ color: "#c4956a" }}>AI</span>
+              Snap<span style={{ color: "#c4956a" }}>Script</span>
             </span>
           </div>
           <p className="text-sm font-medium mt-3 uppercase tracking-widest" style={{ color: "#9a9a9a" }}>Initializing...</p>

@@ -76,7 +76,7 @@ const Signup = ({ onSignupSuccess }) => {
               <Zap className="w-4 h-4 fill-current" style={{ color: T.accent }} />
             </div>
             <span className="text-xl font-black tracking-tight" style={{ color: T.dark }}>
-              Caption<span style={{ color: T.accent }}>AI</span>
+              Snap<span style={{ color: T.accent }}>Script</span>
             </span>
           </div>
 
@@ -93,7 +93,7 @@ const Signup = ({ onSignupSuccess }) => {
           </h2>
 
           <p className="text-[15px] leading-relaxed font-medium mb-7 max-w-[300px]" style={{ color: T.mid }}>
-            Join thousands of creators who use CaptionAI to write smarter captions — faster, and with zero effort.
+            Join thousands of creators who use SnapScript to write smarter captions — faster, and with zero effort.
           </p>
 
           {/* Checklist */}
