@@ -10,10 +10,10 @@ const T = {
   accentHover: "#b5845a", border: "#e8e0d5"
 };
 
-const Signup = () => {
+const Signup = ({ onSignupSuccess }) => {
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
-  const [formData, setFormData] = useState({ username: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ fullName: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -21,9 +21,10 @@ const Signup = () => {
     setLoading(true);
     console.log("Attempting signup with:", formData.email);
     try {
-      const res = await axios.post("http://localhost:3000/api/users", formData);
+      const res = await axios.post("http://localhost:3000/api/auth/register", formData, { withCredentials: true });
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/Image-Captioner");
+      if (onSignupSuccess) onSignupSuccess();
+      navigate("/captions-by-image");
     } catch (err) {
       console.error("Signup Error:", err.response?.data || err.message);
       alert(err.response?.data?.error || "Registration failed. Check backend connection.");
@@ -74,7 +75,7 @@ const Signup = () => {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[11px] font-black uppercase tracking-[0.15em] ml-1 text-[#9a9a9a]">Username</label>
+                <label className="text-[11px] font-black uppercase tracking-[0.15em] ml-1 text-[#9a9a9a]">Full Name</label>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors group-focus-within:text-[#c4956a]" style={{ color: T.muted }} />
                   <input
@@ -83,7 +84,7 @@ const Signup = () => {
                     placeholder="John Sterling"
                     className="w-full pl-12 pr-4 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
                     style={{ background: "#fff", borderColor: T.border }}
-                    onChange={e => setFormData({ ...formData, username: e.target.value })}
+                    onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                     onFocus={e => e.target.style.borderColor = T.accent}
                     onBlur={e => e.target.style.borderColor = T.border}
                   />

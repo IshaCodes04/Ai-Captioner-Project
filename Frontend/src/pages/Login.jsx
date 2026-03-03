@@ -10,7 +10,7 @@ const T = {
   accentHover: "#b5845a", border: "#e8e0d5"
 };
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const navigate = useNavigate();
   const [showPass, setShowPass] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -21,9 +21,10 @@ const Login = () => {
     setLoading(true);
     console.log("Attempting login with:", formData.email);
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/login", formData);
+      const res = await axios.post("http://localhost:3000/api/auth/login", formData, { withCredentials: true });
       localStorage.setItem("user", JSON.stringify(res.data.user));
-      navigate("/Image-Captioner");
+      if (onLoginSuccess) onLoginSuccess();
+      navigate("/captions-by-image");
     } catch (err) {
       console.error("Login Error:", err.response?.data || err.message);
       alert(err.response?.data?.message || "Login failed. Check backend connection.");

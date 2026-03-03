@@ -30,7 +30,7 @@ const App = () => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
-      navigate("/image-by-captions");
+      navigate("/captions-by-image");
     }
   };
 
@@ -39,7 +39,7 @@ const App = () => {
     if (storedUser) {
       const userData = JSON.parse(storedUser);
       setUser(userData);
-      navigate("/image-by-captions");
+      navigate("/captions-by-image");
     } else {
       navigate("/login");
     }
@@ -89,7 +89,7 @@ const App = () => {
         path="/login"
         element={
           user ? (
-            <Navigate to="/image-by-captions" replace />
+            <Navigate to="/captions-by-image" replace />
           ) : (
             <Login onLoginSuccess={handleLoginSuccess} />
           )
@@ -100,16 +100,16 @@ const App = () => {
         path="/signup"
         element={
           user ? (
-            <Navigate to="/image-by-captions" replace />
+            <Navigate to="/captions-by-image" replace />
           ) : (
             <Signup onSignupSuccess={handleSignupSuccess} />
           )
         }
       />
 
-      {/* Protected Image Captioner UI at /image-by-captions */}
+      {/* Protected Image Captioner UI at /captions-by-image */}
       <Route
-        path="/image-by-captions"
+        path="/captions-by-image"
         element={
           user ? (
             <ImageCaptioner

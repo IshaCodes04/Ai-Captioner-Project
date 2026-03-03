@@ -204,7 +204,13 @@ const ImageCaptioner = ({ onLogout, user }) => {
             showToast("Caption generated! ✨");
             if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
         } catch (err) {
-            showToast(err.response?.data?.message || "Upload failed. Try again.", "error");
+            console.error("Upload error:", err.response?.data);
+            if (err.response?.status === 401) {
+                showToast("Session expired. Signing out...", "error");
+                setTimeout(onLogout, 1500);
+            } else {
+                showToast(err.response?.data?.message || "Upload failed. Try again.", "error");
+            }
             setPreviewUrl(null);
         } finally { setIsGenerating(false); }
     };
@@ -224,7 +230,13 @@ const ImageCaptioner = ({ onLogout, user }) => {
             showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready! ✨`);
             if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
         } catch (err) {
-            showToast(err.response?.data?.message || "Generation failed. Try again.", "error");
+            console.error("Regeneration error:", err.response?.data);
+            if (err.response?.status === 401) {
+                showToast("Session expired. Signing out...", "error");
+                setTimeout(onLogout, 1500);
+            } else {
+                showToast(err.response?.data?.message || "Generation failed. Try again.", "error");
+            }
         } finally { setIsGenerating(false); }
     };
 
@@ -280,7 +292,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
             <main className="max-w-7xl mx-auto px-8 py-12">
                 <div className="mb-12">
                     <h1 className="text-4xl font-black tracking-tight mb-2" style={{ color: T.dark }}>
-                        AI Caption <span style={{ color: T.accent }}>Studio</span>
+                        Captions by <span style={{ color: T.accent }}>Image</span>
                     </h1>
                     <p className="font-medium" style={{ color: T.muted }}>Upload an image → AI reads the scene → Get your perfect caption</p>
                 </div>
