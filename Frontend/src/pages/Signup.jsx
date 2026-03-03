@@ -19,32 +19,40 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    console.log("Attempting signup with:", formData.email);
     try {
       const res = await axios.post("http://localhost:3000/api/users", formData);
       localStorage.setItem("user", JSON.stringify(res.data.user));
       navigate("/Image-Captioner");
     } catch (err) {
-      alert(err.response?.data?.error || "Registration failed");
+      console.error("Signup Error:", err.response?.data || err.message);
+      alert(err.response?.data?.error || "Registration failed. Check backend connection.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-stretch bg-[#fafafa]" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen flex items-stretch bg-[#fafafa] relative" style={{ fontFamily: "'Inter', sans-serif" }}>
+
+      {/* ── EXTREME LEFT BUTTON ── */}
+      <button onClick={() => navigate("/home")}
+        className="fixed top-10 left-10 z-[100] flex items-center gap-2 text-xs font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
+        style={{ color: T.dark }}>
+        <ChevronLeft className="w-4 h-4" /> Back to Home
+      </button>
 
       {/* ── LEFT PANEL ── */}
       <div className="hidden lg:flex w-[45%] relative flex-col justify-center p-20 overflow-hidden">
-        {/* Abstract Glow (No sharp line) */}
         <div className="absolute top-0 left-0 w-full h-full opacity-40 pointer-events-none"
           style={{ background: `radial-gradient(circle at 0% 0%, rgba(196,149,106,0.15) 0%, transparent 70%)` }}></div>
 
         <div className="relative z-10 max-w-sm">
-          <div className="mb-12 animate-fadeIn">
+          <div className="mb-12">
             <Logo textVisible={false} size={54} />
           </div>
 
-          <div className="space-y-6 animate-fadeUp">
+          <div className="space-y-6">
             <h1 className="text-6xl font-black leading-[1.05] tracking-tight text-[#1a1a1a]">
               Join the <span className="block" style={{ color: T.accent }}>Creator Hub</span>
             </h1>
@@ -52,31 +60,11 @@ const Signup = () => {
               Unlock the full potential of your visual content with AI-driven scripts and AI captions.
             </p>
           </div>
-
-          <div className="mt-16 space-y-6">
-            {[
-              { icon: <CheckCircle2 />, l: "Free Plan Available" },
-              { icon: <Sparkles />, l: "Gemini AI Powered" }
-            ].map((f, i) => (
-              <div key={i} className="flex items-center gap-4 group">
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center bg-white shadow-sm border border-[#e8e0d5] transition-transform group-hover:scale-110" style={{ color: T.accent }}>
-                  {React.cloneElement(f.icon, { className: "w-5 h-5" })}
-                </div>
-                <span className="font-bold text-sm tracking-tight" style={{ color: T.dark }}>{f.l}</span>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
 
       {/* ── RIGHT PANEL ── */}
       <div className="flex-1 flex flex-col justify-center items-center px-8 relative">
-        <button onClick={() => navigate("/home")}
-          className="absolute top-10 left-10 flex items-center gap-2 text-xs font-bold uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
-          style={{ color: T.dark }}>
-          <ChevronLeft className="w-4 h-4" /> Back to Home
-        </button>
-
         <div className="w-full max-w-[480px] animate-fadeUp">
           <div className="bg-white rounded-[48px] p-12 border border-[#e8e0d5] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)]">
             <div className="mb-10 text-center">
@@ -96,6 +84,8 @@ const Signup = () => {
                     className="w-full pl-12 pr-4 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, username: e.target.value })}
+                    onFocus={e => e.target.style.borderColor = T.accent}
+                    onBlur={e => e.target.style.borderColor = T.border}
                   />
                 </div>
               </div>
@@ -111,6 +101,8 @@ const Signup = () => {
                     className="w-full pl-12 pr-4 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    onFocus={e => e.target.style.borderColor = T.accent}
+                    onBlur={e => e.target.style.borderColor = T.border}
                   />
                 </div>
               </div>
@@ -126,6 +118,8 @@ const Signup = () => {
                     className="w-full pl-12 pr-12 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
+                    onFocus={e => e.target.style.borderColor = T.accent}
+                    onBlur={e => e.target.style.borderColor = T.border}
                   />
                   <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-40 hover:opacity-100 transition-opacity">
                     {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
