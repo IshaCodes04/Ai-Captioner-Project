@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router()
 const authMiddleware = require("../middlewares/auth.middleware");
-const {createPostController} = require("../Controllers/post.controller")
+const { createPostController, getUserPostsController } = require("../Controllers/post.controller")
 const multer = require("multer");
 
 
@@ -21,9 +21,11 @@ const upload = multer({
 })
 
 
+// GET /api/posts [protected] - get user history
+router.get('/', authMiddleware, getUserPostsController);
 
 // POST /api/posts [protected] {image-file}
-router.post('/', 
+router.post('/',
   authMiddleware, // if req is authorized then req.user = userData set kr dega simple or next se req forward ho jyegi
   upload.single("image"),
   createPostController)

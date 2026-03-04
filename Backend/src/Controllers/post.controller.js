@@ -30,6 +30,7 @@ async function createPostController(req, res) {
     const post = await postModel.create({
       caption: caption,
       image: result.url,
+      tone: tone,
       user: req.user._id,
     });
     console.log("Post saved to DB.");
@@ -50,4 +51,13 @@ async function createPostController(req, res) {
   }
 }
 
-module.exports = { createPostController };
+async function getUserPostsController(req, res) {
+  try {
+    const posts = await postModel.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.status(200).json({ posts });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching posts", error: error.message });
+  }
+}
+
+module.exports = { createPostController, getUserPostsController };
