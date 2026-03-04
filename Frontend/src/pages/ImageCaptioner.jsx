@@ -344,7 +344,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
             {/* NAVBAR */}
             <nav className="sticky top-0 z-[100] border-b" style={{ background: "white", borderColor: T.border }}>
                 <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
-                    <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate("/home")}>
+                    <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow" style={{ background: T.dark }}>
                             <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
                         </div>

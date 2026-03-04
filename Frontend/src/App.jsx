@@ -81,7 +81,12 @@ const App = () => {
       <Route path="/" element={<Navigate to="/home" replace />} />
 
       {/* Home Landing Page at /home */}
-      <Route path="/home" element={<Home />} />
+      <Route
+        path="/home"
+        element={
+          user ? <Navigate to="/captions-by-image" replace /> : <Home />
+        }
+      />
 
       {/* Auth Routes */}
       <Route
