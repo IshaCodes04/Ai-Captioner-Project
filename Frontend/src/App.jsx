@@ -6,7 +6,6 @@ import Home from "./pages/Home";
 import ImageCaptioner from "./pages/ImageCaptioner";
 
 const App = () => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -113,8 +112,6 @@ const App = () => {
         element={
           user ? (
             <ImageCaptioner
-              isDarkMode={isDarkMode}
-              setIsDarkMode={setIsDarkMode}
               onLogout={handleLogout}
               user={user}
             />

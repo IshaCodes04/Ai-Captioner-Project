@@ -1,14 +1,16 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
     Upload, Copy, Sparkles, Zap, LogOut, RefreshCw,
-
+    History, Image as ImageIcon, Smile, Laugh, Briefcase,
+    Theater, Hash, CheckCircle2, ChevronDown, Trash2
+} from "lucide-react";
 const T = {
-        bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
-        mid: "#4a4a4a", muted: "#9a9a9a", accent: "#c4956a",
-        accentHover: "#b5845a", border: "#e8e0d5",
-    };
+    bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
+    mid: "#4a4a4a", muted: "#9a9a9a", accent: "#c4956a",
+    accentHover: "#b5845a", border: "#e8e0d5",
+};
 
 // ─── Markdown Parser ────────────────────────────────────────────────
 // Converts AI output like **Section:** * bullet into structured data
@@ -162,7 +164,7 @@ const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────
-const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
+const ImageCaptioner = ({ onLogout, user }) => {
     const navigate = useNavigate();
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -174,6 +176,28 @@ const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
     const [showHistory, setShowHistory] = useState(false);
     const fileInputRef = useRef(null);
     const uploadedFileRef = useRef(null); // store last uploaded file for regeneration
+
+    // Fetch History on Mount
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const res = await axios.get("http://localhost:3000/api/posts", { withCredentials: true });
+                if (res.data?.posts) {
+                    const formattedHistory = res.data.posts.map(p => ({
+                        id: p._id,
+                        caption: p.caption,
+                        style: p.tone || "casual",
+                        image: p.image, // we can use this to show small preview later
+                        timestamp: new Date(p.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                    }));
+                    setCaptionHistory(formattedHistory);
+                }
+            } catch (err) {
+                console.error("Error fetching history:", err);
+            }
+        };
+        fetchHistory();
+    }, []);
 
     const captionStyles = [
         { id: "casual", label: "Casual", icon: <Smile className="w-4 h-4" /> },
@@ -203,7 +227,16 @@ const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast("Caption generated! ✨");
-            if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
+            if (gen && res.data?.post) {
+                const newPost = {
+                    id: res.data.post._id,
+                    caption: gen,
+                    style: res.data.post.tone || captionStyle,
+                    image: res.data.post.image,
+                    timestamp: new Date(res.data.post.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                };
+                setCaptionHistory(prev => [newPost, ...prev.slice(0, 9)]);
+            }
         } catch (err) {
             console.error("Upload error:", err.response?.data);
             if (err.response?.status === 401) {
@@ -229,7 +262,16 @@ const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready! ✨`);
-            if (gen) setCaptionHistory(prev => [{ id: Date.now(), caption: gen, style: captionStyle, timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) }, ...prev.slice(0, 9)]);
+            if (gen && res.data?.post) {
+                const newPost = {
+                    id: res.data.post._id,
+                    caption: gen,
+                    style: res.data.post.tone || captionStyle,
+                    image: res.data.post.image,
+                    timestamp: new Date(res.data.post.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+                };
+                setCaptionHistory(prev => [newPost, ...prev.slice(0, 9)]);
+            }
         } catch (err) {
             console.error("Regeneration error:", err.response?.data);
             if (err.response?.status === 401) {
@@ -446,15 +488,26 @@ const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
                                 {showHistory && (
                                     <div className="px-4 pb-4 space-y-2 max-h-64 overflow-y-auto" style={{ borderTop: `1px solid ${T.border}`, paddingTop: "12px" }}>
                                         {captionHistory.map(item => (
-                                            <button key={item.id} onClick={() => setCaption(item.caption)}
-                                                className="w-full text-left p-4 rounded-2xl border transition-all hover:-translate-x-1 group"
+                                            <button key={item.id}
+                                                onClick={() => {
+                                                    setCaption(item.caption);
+                                                    if (item.image) setPreviewUrl(item.image);
+                                                }}
+                                                className="w-full text-left p-4 rounded-2xl border transition-all hover:translate-x-1 group flex gap-3"
                                                 style={{ background: T.surface, borderColor: T.border }}
                                                 onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; }}
                                                 onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; }}>
-                                                <p className="text-xs font-medium line-clamp-2 mb-2 transition-colors" style={{ color: T.mid }}>"{item.caption}"</p>
-                                                <div className="flex justify-between items-center">
-                                                    <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: T.accent }}>{item.style}</span>
-                                                    <span className="text-[10px]" style={{ color: T.muted }}>{item.timestamp}</span>
+                                                {item.image && (
+                                                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border" style={{ borderColor: T.border }}>
+                                                        <img src={item.image} alt="prev" className="w-full h-full object-cover" />
+                                                    </div>
+                                                )}
+                                                <div className="flex-grow">
+                                                    <p className="text-xs font-medium line-clamp-2 mb-2 transition-colors" style={{ color: T.mid }}>"{item.caption}"</p>
+                                                    <div className="flex justify-between items-center">
+                                                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: T.accent }}>{item.style}</span>
+                                                        <span className="text-[10px]" style={{ color: T.muted }}>{item.timestamp}</span>
+                                                    </div>
                                                 </div>
                                             </button>
                                         ))}
