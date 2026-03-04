@@ -76,23 +76,22 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
   try {
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
 
-    const contents = [
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64ImageFile,
-        },
-      },
-      { text: config.userPrompt },
-    ];
-
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: contents,
+      model: "gemini-flash-latest", // Switching to verified model identifier
       systemInstruction: config.systemInstruction,
+      contents: [
+        {
+          parts: [
+            { text: config.userPrompt },
+            { inlineData: { mimeType: "image/jpeg", data: base64ImageFile } }
+          ]
+        }
+      ]
     });
 
-    return response.text;
+    // Unified SDK uses this structure for text extraction
+    const captionText = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    return captionText;
   } catch (error) {
     console.error("Error generating caption:", error);
     throw new Error("Failed to generate caption: " + error.message);

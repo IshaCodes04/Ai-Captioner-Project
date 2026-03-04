@@ -18,21 +18,31 @@ async function createPostController(req, res) {
     const base64Image = Buffer.from(file.buffer).toString("base64");
 
     // Pass tone to AI service
+    console.log("Generating caption with AI...");
     const caption = await generateCaptions(base64Image, tone);
-    const result = await uploadFile(file.buffer, `${uuidv4()}`);
+    console.log("AI Caption generated:", caption.substring(0, 30) + "...");
 
+    console.log("Uploading to ImageKit...");
+    const result = await uploadFile(file.buffer, `${uuidv4()}`);
+    console.log("Image uploaded to:", result.url);
+
+    console.log("Saving to DB...");
     const post = await postModel.create({
       caption: caption,
       image: result.url,
       user: req.user._id,
     });
+    console.log("Post saved to DB.");
 
     res.status(201).json({
       message: "Post Created Successfully",
       post,
     });
   } catch (error) {
-    console.error("Error creating post:", error);
+    const fs = require('fs');
+    const logMsg = `\n[${new Date().toISOString()}] Error: ${error.message}\nStack: ${error.stack}\n`;
+    fs.appendFileSync('error_debug.log', logMsg);
+    console.error("Detailed Error in createPostController:", error);
     res.status(500).json({
       message: "Error creating post",
       error: error.message,
