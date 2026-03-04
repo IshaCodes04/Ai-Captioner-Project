@@ -3,16 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
     Upload, Copy, Sparkles, Zap, LogOut, RefreshCw,
-    History, Image as ImageIcon, Smile, Laugh, Briefcase,
-    Theater, Hash, CheckCircle2, ChevronDown, Trash2
-} from "lucide-react";
-import Footer from "../components/Footer";
 
 const T = {
-    bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
-    mid: "#4a4a4a", muted: "#9a9a9a", accent: "#c4956a",
-    accentHover: "#b5845a", border: "#e8e0d5",
-};
+        bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
+        mid: "#4a4a4a", muted: "#9a9a9a", accent: "#c4956a",
+        accentHover: "#b5845a", border: "#e8e0d5",
+    };
 
 // ─── Markdown Parser ────────────────────────────────────────────────
 // Converts AI output like **Section:** * bullet into structured data
@@ -28,8 +24,8 @@ const parseCaptionMarkdown = (text) => {
             currentSection = { title: headerMatch[1].replace(/:$/, ""), bullets: [] };
             const rest = headerMatch[2].trim();
             if (rest) currentSection.bullets.push(rest);
-        } else if (/^[\*•\-]\s+/.test(line)) {
-            const bullet = line.replace(/^[\*•\-]\s+/, "").trim();
+        } else if (/^[*•-]\s+/.test(line)) {
+            const bullet = line.replace(/^[*•-]\s+/, "").trim();
             if (bullet) {
                 if (!currentSection) currentSection = { title: null, bullets: [] };
                 currentSection.bullets.push(bullet);
@@ -52,7 +48,9 @@ const CaptionBullet = ({ text, T }) => {
             await navigator.clipboard.writeText(text);
             setCopiedItem(true);
             setTimeout(() => setCopiedItem(false), 2000);
-        } catch { }
+        } catch (error) {
+            console.error("Copy failed", error);
+        }
     };
 
     return (
@@ -97,7 +95,9 @@ const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
             await navigator.clipboard.writeText(caption);
             setCopiedAll(true);
             setTimeout(() => setCopiedAll(false), 2500);
-        } catch { }
+        } catch (error) {
+            console.error("Copy all failed", error);
+        }
     };
 
     // If parsing produced nothing meaningful, fall back to raw display
@@ -162,7 +162,7 @@ const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
 };
 
 // ─── Main Component ───────────────────────────────────────────────────
-const ImageCaptioner = ({ onLogout, user }) => {
+const ImageCaptioner = ({ onLogout, user, isDarkMode, setIsDarkMode }) => {
     const navigate = useNavigate();
     const [previewUrl, setPreviewUrl] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
@@ -465,7 +465,6 @@ const ImageCaptioner = ({ onLogout, user }) => {
                     </div>
                 </div>
             </main>
-            <Footer />
         </div>
     );
 };
