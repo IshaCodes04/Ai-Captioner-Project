@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
     Upload, Copy, Sparkles, Zap, LogOut, RefreshCw,
     History, Image as ImageIcon, Smile, Laugh, Briefcase,
-    Theater, Hash, CheckCircle2, ChevronDown, Trash2
+    Theater, Hash, CheckCircle2, ChevronDown, Trash2, LayoutGrid
 } from "lucide-react";
 const T = {
     bg: "#fafafa", surface: "#f5f0eb", dark: "#1a1a1a",
@@ -163,6 +163,47 @@ const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
     );
 };
 
+// ─── Gallery View ─────────────────────────────────────────────────────
+const GalleryView = ({ history, T, onSelect }) => {
+    return (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {history.map((item) => (
+                <div
+                    key={item.id}
+                    onClick={() => onSelect(item)}
+                    className="group relative bg-white rounded-[32px] border border-[#e8e0d5] overflow-hidden cursor-pointer hover:shadow-2xl hover:-translate-y-1 transition-all"
+                >
+                    <div className="aspect-[4/3] w-full overflow-hidden">
+                        <img
+                            src={item.image}
+                            alt="captioned"
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        />
+                    </div>
+                    <div className="p-6">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: T.surface, color: T.accent }}>
+                                {item.style}
+                            </span>
+                            <span className="text-[10px] font-bold" style={{ color: T.muted }}>
+                                {item.timestamp}
+                            </span>
+                        </div>
+                        <p className="text-sm font-medium line-clamp-3 leading-relaxed" style={{ color: T.dark }}>
+                            "{item.caption}"
+                        </p>
+                    </div>
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
+                        <div className="bg-white/90 p-4 rounded-2xl scale-90 group-hover:scale-100 transition-transform">
+                            <Sparkles className="w-6 h-6" style={{ color: T.accent }} />
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 // ─── Main Component ───────────────────────────────────────────────────
 const ImageCaptioner = ({ onLogout, user }) => {
     const navigate = useNavigate();
@@ -174,6 +215,8 @@ const ImageCaptioner = ({ onLogout, user }) => {
     const [dragOver, setDragOver] = useState(false);
     const [captionHistory, setCaptionHistory] = useState([]);
     const [showHistory, setShowHistory] = useState(false);
+    const [showProfile, setShowProfile] = useState(false);
+    const [activeTab, setActiveTab] = useState("editor"); // 'editor' or 'gallery'
     const fileInputRef = useRef(null);
     const uploadedFileRef = useRef(null); // store last uploaded file for regeneration
 
@@ -314,209 +357,237 @@ const ImageCaptioner = ({ onLogout, user }) => {
                             AI Online
                         </div>
 
+                        <div className="h-8 w-px bg-[#e8e0d5] hidden md:block"></div>
+
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => setActiveTab("editor")}
+                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "editor" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                style={activeTab === "editor" ? { background: T.dark, color: "white" } : { color: T.dark }}
+                            >
+                                Create
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("gallery")}
+                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === "gallery" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                style={activeTab === "gallery" ? { background: T.dark, color: "white" } : { color: T.dark }}
+                            >
+                                <LayoutGrid className="w-3.5 h-3.5" />
+                                Your Gallery
+                            </button>
+                        </div>
+
                         {user && (
-                            <div className="hidden md:flex items-center gap-2.5 px-4 py-2 rounded-xl border" style={{ background: T.surface, borderColor: T.border }}>
-                                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{ background: T.accent }}>
-                                    {user.fullName?.charAt(0)?.toUpperCase() || "U"}
-                                </div>
-                                <span className="text-sm font-semibold" style={{ color: T.mid }}>{user.fullName?.split(" ")[0]}</span>
+                            <div className="relative">
+                                <button
+                                    onClick={() => setShowProfile(!showProfile)}
+                                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl border transition-all hover:bg-white active:scale-95"
+                                    style={{ background: T.surface, borderColor: showProfile ? T.accent : T.border }}
+                                >
+                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{ background: T.accent }}>
+                                        {user.fullName?.charAt(0)?.toUpperCase() || "U"}
+                                    </div>
+                                    <span className="hidden sm:inline text-sm font-semibold" style={{ color: T.mid }}>{user.fullName?.split(" ")[0]}</span>
+                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${showProfile ? "rotate-180" : ""}`} style={{ color: T.muted }} />
+                                </button>
+
+                                {showProfile && (
+                                    <div className="absolute right-0 mt-3 w-64 rounded-2xl border shadow-2xl p-5 z-[200] animate-in fade-in slide-in-from-top-2" style={{ background: "white", borderColor: T.border }}>
+                                        <div className="flex items-center gap-4 mb-4">
+                                            <div className="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black text-white" style={{ background: T.accent }}>
+                                                {user.fullName?.charAt(0)?.toUpperCase() || "U"}
+                                            </div>
+                                            <div className="overflow-hidden">
+                                                <p className="font-black text-sm truncate" style={{ color: T.dark }}>{user.fullName}</p>
+                                                <p className="text-[10px] font-medium truncate uppercase tracking-widest" style={{ color: T.muted }}>{user.email}</p>
+                                            </div>
+                                        </div>
+                                        <div className="h-px w-full mb-4" style={{ background: T.border }}></div>
+                                        <button
+                                            onClick={onLogout}
+                                            className="w-full flex items-center justify-between p-3 rounded-xl transition-all group"
+                                            style={{ color: "#ef4444" }}
+                                            onMouseEnter={e => e.currentTarget.style.background = "#fff1f2"}
+                                            onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <LogOut className="w-4 h-4" />
+                                                <span className="font-bold text-sm">Logout Session</span>
+                                            </div>
+                                            <ChevronDown className="-rotate-90 w-3 h-3 opacity-30 group-hover:opacity-100 transition-opacity" />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
 
-                        <button onClick={onLogout} className="flex items-center gap-2 font-semibold text-sm transition-colors group" style={{ color: T.muted }} onMouseEnter={e => e.currentTarget.style.color = "#dc2626"} onMouseLeave={e => e.currentTarget.style.color = T.muted}>
-                            <LogOut className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                            <span className="hidden md:inline">Logout</span>
-                        </button>
                     </div>
                 </div>
             </nav>
 
-            {/* MAIN */}
             <main className="max-w-7xl mx-auto px-8 py-12">
                 <div className="mb-12">
                     <h1 className="text-4xl font-black tracking-tight mb-2" style={{ color: T.dark }}>
-                        Captions by <span style={{ color: T.accent }}>Image</span>
+                        {activeTab === "editor" ? (
+                            <>Captions by <span style={{ color: T.accent }}>Image</span></>
+                        ) : (
+                            <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
+                        )}
                     </h1>
-                    <p className="font-medium" style={{ color: T.muted }}>Upload an image → AI reads the scene → Get your perfect caption</p>
+                    <p className="font-medium" style={{ color: T.muted }}>
+                        {activeTab === "editor"
+                            ? "Upload an image → AI reads the scene → Get your perfect caption"
+                            : "Explore your collection of AI-generated stories and visuals"
+                        }
+                    </p>
                 </div>
 
-                <div className="grid lg:grid-cols-[1fr_420px] gap-10">
+                {activeTab === "gallery" ? (
+                    <GalleryView
+                        history={captionHistory}
+                        T={T}
+                        onSelect={(item) => {
+                            setCaption(item.caption);
+                            setPreviewUrl(item.image);
+                            setActiveTab("editor");
+                        }}
+                    />
+                ) : (
+                    <div className="grid lg:grid-cols-[1fr_420px] gap-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
 
-                    {/* UPLOAD */}
-                    <div className="space-y-8">
-                        <div
-                            className="relative border-2 border-dashed rounded-[32px] transition-all cursor-pointer overflow-hidden group"
-                            style={{ borderColor: dragOver ? T.accent : T.border, background: dragOver ? `rgba(196,149,106,0.05)` : T.surface }}
-                            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-                            onDragLeave={() => setDragOver(false)}
-                            onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
-                            onClick={() => !previewUrl && fileInputRef.current?.click()}
-                        >
-                            {previewUrl ? (
-                                <div className="relative">
-                                    <img src={previewUrl} alt="Preview" className="w-full max-h-[520px] object-cover rounded-[30px]" />
-                                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all rounded-[30px] flex items-center justify-center gap-5" style={{ background: "rgba(26,26,26,0.6)", backdropFilter: "blur(4px)" }}>
-                                        <button onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setCaption(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                                            className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(239,68,68,0.8)" }}>
-                                            <Trash2 className="w-4 h-4" /> Remove
-                                        </button>
-                                        <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                                            className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(255,255,255,0.2)" }}>
-                                            <Upload className="w-4 h-4" /> Replace
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="flex flex-col items-center gap-5 py-24 px-8 text-center">
-                                    <div className="w-20 h-20 rounded-3xl flex items-center justify-center border-2 group-hover:scale-110 transition-all" style={{ background: "white", borderColor: T.border }}>
-                                        <ImageIcon className="w-10 h-10 transition-colors" style={{ color: T.muted }} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Drop your image here</p>
-                                        <p className="font-medium text-sm" style={{ color: T.muted }}>or click to browse files</p>
-                                    </div>
-                                    <div className="flex flex-wrap justify-center gap-2">
-                                        {["JPG", "PNG", "WebP", "Max 10MB"].map(tag => (
-                                            <span key={tag} className="px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider border" style={{ background: "white", borderColor: T.border, color: T.muted }}>{tag}</span>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
-                        </div>
-
-                        {/* Style Selector */}
-                        {previewUrl && (
-                            <div className="rounded-3xl p-6 border" style={{ background: "white", borderColor: T.border }}>
-                                <div className="flex items-center gap-2.5 mb-5">
-                                    <Sparkles className="w-4 h-4" style={{ color: T.accent }} />
-                                    <p className="font-black text-sm" style={{ color: T.dark }}>Choose Caption Tone</p>
-                                </div>
-                                <div className="grid grid-cols-5 gap-3">
-                                    {captionStyles.map(style => (
-                                        <button key={style.id} onClick={() => setCaptionStyle(style.id)}
-                                            className="flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95"
-                                            style={captionStyle === style.id
-                                                ? { background: T.dark, borderColor: T.dark, color: "white" }
-                                                : { background: T.surface, borderColor: T.border, color: T.muted }
-                                            }
-                                            onMouseEnter={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; } }}
-                                            onMouseLeave={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; } }}
-                                        >
-                                            {React.cloneElement(style.icon, { className: "w-5 h-5" })}
-                                            {style.label}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* OUTPUT */}
-                    <div className="flex flex-col gap-6">
-                        <div className="flex-grow rounded-3xl p-8 border flex flex-col min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
-                            <div className="flex items-center justify-between mb-6">
-                                <div className="flex items-center gap-2.5">
-                                    <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
-                                        <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
-                                    </div>
-                                    <p className="font-black" style={{ color: T.dark }}>AI Output</p>
-                                </div>
-                                {caption && (
-                                    <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", color: "#059669", border: "1px solid rgba(52,211,153,0.2)" }}>Ready</div>
-                                )}
-                            </div>
-
-                            <div className="flex-grow flex flex-col justify-center">
-                                {isGenerating ? (
-                                    <div className="flex flex-col items-center gap-6 py-12 text-center">
-                                        <div className="relative w-16 h-16">
-                                            <div className="absolute inset-0 border-4 rounded-full" style={{ borderColor: `rgba(196,149,106,0.15)` }}></div>
-                                            <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${T.accent} transparent transparent transparent` }}></div>
-                                        </div>
-                                        <div>
-                                            <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Analyzing image...</p>
-                                            <p className="font-medium text-sm" style={{ color: T.muted }}>AI is reading the scene, mood &amp; context</p>
-                                        </div>
-                                        <div className="flex gap-2">
-                                            {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: T.accent, animationDelay: `${i * 0.15}s` }}></div>)}
+                        {/* UPLOAD */}
+                        <div className="space-y-8">
+                            <div
+                                className="relative border-2 border-dashed rounded-[32px] transition-all cursor-pointer overflow-hidden group"
+                                style={{ borderColor: dragOver ? T.accent : T.border, background: dragOver ? `rgba(196,149,106,0.05)` : T.surface }}
+                                onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                                onDragLeave={() => setDragOver(false)}
+                                onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) handleFile(f); }}
+                                onClick={() => !previewUrl && fileInputRef.current?.click()}
+                            >
+                                {previewUrl ? (
+                                    <div className="relative">
+                                        <img src={previewUrl} alt="Preview" className="w-full max-h-[520px] object-cover rounded-[30px]" />
+                                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all rounded-[30px] flex items-center justify-center gap-5" style={{ background: "rgba(26,26,26,0.6)", backdropFilter: "blur(4px)" }}>
+                                            <button onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setCaption(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                                                className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(239,68,68,0.8)" }}>
+                                                <Trash2 className="w-4 h-4" /> Remove
+                                            </button>
+                                            <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                                                className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(255,255,255,0.2)" }}>
+                                                <Upload className="w-4 h-4" /> Replace
+                                            </button>
                                         </div>
                                     </div>
-                                ) : caption ? (
-                                    <CaptionOutput
-                                        caption={caption}
-                                        T={T}
-                                        onRegenerateClick={generateCaption}
-                                    />
                                 ) : (
-                                    <div className="flex flex-col items-center gap-4 py-12 text-center opacity-40">
-                                        <Sparkles className="w-16 h-16 animate-float" style={{ color: T.border }} />
+                                    <div className="flex flex-col items-center gap-5 py-24 px-8 text-center">
+                                        <div className="w-20 h-20 rounded-3xl flex items-center justify-center border-2 group-hover:scale-110 transition-all" style={{ background: "white", borderColor: T.border }}>
+                                            <ImageIcon className="w-10 h-10 transition-colors" style={{ color: T.muted }} />
+                                        </div>
                                         <div>
-                                            <p className="text-lg font-black mb-1" style={{ color: T.muted }}>No caption yet</p>
-                                            <p className="font-medium text-sm" style={{ color: T.border }}>Upload an image to get started</p>
+                                            <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Drop your image here</p>
+                                            <p className="font-medium text-sm" style={{ color: T.muted }}>or click to browse files</p>
+                                        </div>
+                                        <div className="flex flex-wrap justify-center gap-2">
+                                            {["JPG", "PNG", "WebP", "Max 10MB"].map(tag => (
+                                                <span key={tag} className="px-3 py-1 rounded-lg text-[11px] font-black uppercase tracking-wider border" style={{ background: "white", borderColor: T.border, color: T.muted }}>{tag}</span>
+                                            ))}
                                         </div>
                                     </div>
                                 )}
+                                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
                             </div>
 
-                            {previewUrl && !isGenerating && (
-                                <button onClick={generateCaption}
-                                    className="mt-6 w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 text-white shadow-lg active:scale-[0.98] transition-all"
-                                    style={{ background: T.dark }}
-                                    onMouseEnter={e => e.currentTarget.style.background = T.accent}
-                                    onMouseLeave={e => e.currentTarget.style.background = T.dark}
-                                >
-                                    <Sparkles className="w-5 h-5" />
-                                    {caption ? `Regenerate (${captionStyles.find(s => s.id === captionStyle)?.label})` : "Generate Caption"}
-                                </button>
-                            )}
-                        </div>
-
-                        {/* History */}
-                        {captionHistory.length > 0 && (
-                            <div className="rounded-3xl overflow-hidden border" style={{ background: "white", borderColor: T.border }}>
-                                <button onClick={() => setShowHistory(!showHistory)} className="w-full flex items-center justify-between px-7 py-5 transition-all"
-                                    style={{ color: T.muted }} onMouseEnter={e => e.currentTarget.style.background = T.surface} onMouseLeave={e => e.currentTarget.style.background = "white"}>
-                                    <div className="flex items-center gap-3">
-                                        <History className="w-4 h-4" />
-                                        <span className="font-black text-sm">Recent Captions</span>
-                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-black" style={{ background: `rgba(196,149,106,0.12)`, color: T.accent }}>{captionHistory.length}</span>
+                            {/* Style Selector */}
+                            {previewUrl && (
+                                <div className="rounded-3xl p-6 border" style={{ background: "white", borderColor: T.border }}>
+                                    <div className="flex items-center gap-2.5 mb-5">
+                                        <Sparkles className="w-4 h-4" style={{ color: T.accent }} />
+                                        <p className="font-black text-sm" style={{ color: T.dark }}>Choose Caption Tone</p>
                                     </div>
-                                    <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showHistory ? "rotate-180" : ""}`} style={{ color: T.muted }} />
-                                </button>
-
-                                {showHistory && (
-                                    <div className="px-4 pb-4 space-y-2 max-h-64 overflow-y-auto" style={{ borderTop: `1px solid ${T.border}`, paddingTop: "12px" }}>
-                                        {captionHistory.map(item => (
-                                            <button key={item.id}
-                                                onClick={() => {
-                                                    setCaption(item.caption);
-                                                    if (item.image) setPreviewUrl(item.image);
-                                                }}
-                                                className="w-full text-left p-4 rounded-2xl border transition-all hover:translate-x-1 group flex gap-3"
-                                                style={{ background: T.surface, borderColor: T.border }}
-                                                onMouseEnter={e => { e.currentTarget.style.borderColor = T.accent; }}
-                                                onMouseLeave={e => { e.currentTarget.style.borderColor = T.border; }}>
-                                                {item.image && (
-                                                    <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border" style={{ borderColor: T.border }}>
-                                                        <img src={item.image} alt="prev" className="w-full h-full object-cover" />
-                                                    </div>
-                                                )}
-                                                <div className="flex-grow">
-                                                    <p className="text-xs font-medium line-clamp-2 mb-2 transition-colors" style={{ color: T.mid }}>"{item.caption}"</p>
-                                                    <div className="flex justify-between items-center">
-                                                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: T.accent }}>{item.style}</span>
-                                                        <span className="text-[10px]" style={{ color: T.muted }}>{item.timestamp}</span>
-                                                    </div>
-                                                </div>
+                                    <div className="grid grid-cols-5 gap-3">
+                                        {captionStyles.map(style => (
+                                            <button key={style.id} onClick={() => setCaptionStyle(style.id)}
+                                                className="flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95"
+                                                style={captionStyle === style.id
+                                                    ? { background: T.dark, borderColor: T.dark, color: "white" }
+                                                    : { background: T.surface, borderColor: T.border, color: T.muted }
+                                                }
+                                                onMouseEnter={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; } }}
+                                                onMouseLeave={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; } }}
+                                            >
+                                                {React.cloneElement(style.icon, { className: "w-5 h-5" })}
+                                                {style.label}
                                             </button>
                                         ))}
                                     </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* OUTPUT */}
+                        <div className="flex flex-col gap-6">
+                            <div className="flex-grow rounded-3xl p-8 border flex flex-col min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
+                                <div className="flex items-center justify-between mb-6">
+                                    <div className="flex items-center gap-2.5">
+                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
+                                            <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
+                                        </div>
+                                        <p className="font-black" style={{ color: T.dark }}>AI Output</p>
+                                    </div>
+                                    {caption && (
+                                        <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", color: "#059669", border: "1px solid rgba(52,211,153,0.2)" }}>Ready</div>
+                                    )}
+                                </div>
+
+                                <div className="flex-grow flex flex-col justify-center">
+                                    {isGenerating ? (
+                                        <div className="flex flex-col items-center gap-6 py-12 text-center">
+                                            <div className="relative w-16 h-16">
+                                                <div className="absolute inset-0 border-4 rounded-full" style={{ borderColor: `rgba(196,149,106,0.15)` }}></div>
+                                                <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${T.accent} transparent transparent transparent` }}></div>
+                                            </div>
+                                            <div>
+                                                <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Analyzing image...</p>
+                                                <p className="font-medium text-sm" style={{ color: T.muted }}>AI is reading the scene, mood &amp; context</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: T.accent, animationDelay: `${i * 0.15}s` }}></div>)}
+                                            </div>
+                                        </div>
+                                    ) : caption ? (
+                                        <CaptionOutput
+                                            caption={caption}
+                                            T={T}
+                                            onRegenerateClick={generateCaption}
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col items-center gap-4 py-12 text-center opacity-40">
+                                            <Sparkles className="w-16 h-16 animate-float" style={{ color: T.border }} />
+                                            <div>
+                                                <p className="text-lg font-black mb-1" style={{ color: T.muted }}>No caption yet</p>
+                                                <p className="font-medium text-sm" style={{ color: T.border }}>Upload an image to get started</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {previewUrl && !isGenerating && (
+                                    <button onClick={generateCaption}
+                                        className="mt-6 w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 text-white shadow-lg active:scale-[0.98] transition-all"
+                                        style={{ background: T.dark }}
+                                        onMouseEnter={e => e.currentTarget.style.background = T.accent}
+                                        onMouseLeave={e => e.currentTarget.style.background = T.dark}
+                                    >
+                                        <Sparkles className="w-5 h-5" />
+                                        {caption ? `Regenerate (${captionStyles.find(s => s.id === captionStyle)?.label})` : "Generate Caption"}
+                                    </button>
                                 )}
                             </div>
-                        )}
+
+                        </div>
                     </div>
-                </div>
+                )}
             </main>
         </div>
     );
