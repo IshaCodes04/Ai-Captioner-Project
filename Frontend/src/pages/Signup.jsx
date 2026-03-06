@@ -65,16 +65,16 @@ const Signup = ({ onSignupSuccess }) => {
       </div>
 
       {/* ── RIGHT PANEL ── */}
-      <div className="flex-1 flex flex-col justify-center items-center px-8 relative">
-        <div className="w-full max-w-[480px] animate-fadeUp">
-          <div className="bg-white rounded-[48px] p-12 border border-[#e8e0d5] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)]">
-            <div className="mb-10 text-center">
+      <div className="flex-1 flex flex-col justify-center items-center px-8 relative py-6 overflow-y-auto">
+        <div className="w-full max-w-[480px] animate-fadeUp my-auto">
+          <div className="bg-white rounded-[32px] p-8 lg:p-10 border border-[#e8e0d5] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)]">
+            <div className="mb-6 text-center">
               <h2 className="text-3xl font-black tracking-tight mb-2" style={{ color: T.dark }}>Create Account</h2>
               <p className="font-medium text-sm text-[#9a9a9a]">Sign up and start captioning in seconds.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="space-y-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] ml-1 text-[#9a9a9a]">Full Name</label>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors group-focus-within:text-[#c4956a]" style={{ color: T.muted }} />
@@ -82,7 +82,7 @@ const Signup = ({ onSignupSuccess }) => {
                     required
                     type="text"
                     placeholder="John Sterling"
-                    className="w-full pl-12 pr-4 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-2xl border-2 outline-none transition-all font-bold text-[14px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, fullName: e.target.value })}
                     onFocus={e => e.target.style.borderColor = T.accent}
@@ -91,7 +91,7 @@ const Signup = ({ onSignupSuccess }) => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] ml-1 text-[#9a9a9a]">Email Address</label>
                 <div className="relative group">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors group-focus-within:text-[#c4956a]" style={{ color: T.muted }} />
@@ -99,7 +99,7 @@ const Signup = ({ onSignupSuccess }) => {
                     required
                     type="email"
                     placeholder="studio@snapscript.com"
-                    className="w-full pl-12 pr-4 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-2xl border-2 outline-none transition-all font-bold text-[14px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                     onFocus={e => e.target.style.borderColor = T.accent}
@@ -108,7 +108,7 @@ const Signup = ({ onSignupSuccess }) => {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="text-[11px] font-black uppercase tracking-[0.15em] ml-1 text-[#9a9a9a]">Create Password</label>
                 <div className="relative group">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4.5 h-4.5 transition-colors group-focus-within:text-[#c4956a]" style={{ color: T.muted }} />
@@ -116,7 +116,7 @@ const Signup = ({ onSignupSuccess }) => {
                     required
                     type={showPass ? "text" : "password"}
                     placeholder="••••••••"
-                    className="w-full pl-12 pr-12 py-4.5 rounded-2xl border-2 outline-none transition-all font-bold text-[15px]"
+                    className="w-full pl-12 pr-12 py-3.5 rounded-2xl border-2 outline-none transition-all font-bold text-[14px]"
                     style={{ background: "#fff", borderColor: T.border }}
                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                     onFocus={e => e.target.style.borderColor = T.accent}
@@ -129,13 +129,27 @@ const Signup = ({ onSignupSuccess }) => {
               </div>
 
               <button disabled={loading} type="submit"
-                className="w-full h-15 rounded-2xl font-black text-lg text-white shadow-xl transition-all flex items-center justify-center gap-3 active:scale-95 disabled:opacity-50 mt-4"
+                className="w-full h-12 rounded-2xl font-black text-base text-white shadow-xl transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 mt-4"
                 style={{ background: T.dark }}>
-                {loading ? <div className="w-6 h-6 border-4 border-white/20 border-t-white rounded-full animate-spin" /> : <><ArrowRight className="w-5 h-5" /> Open My Workspace</>}
+                {loading ? <div className="w-5 h-5 border-4 border-white/20 border-t-white rounded-full animate-spin" /> : <><ArrowRight className="w-4 h-4" /> Open My Workspace</>}
               </button>
             </form>
 
-            <p className="mt-8 text-center text-sm font-medium text-[#9a9a9a]">
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <div className="h-px bg-[#e8e0d5] flex-1"></div>
+              <span className="text-xs font-black uppercase tracking-widest text-[#9a9a9a]">OR</span>
+              <div className="h-px bg-[#e8e0d5] flex-1"></div>
+            </div>
+
+            <button
+              onClick={() => window.location.href = "http://localhost:3000/api/auth/google"}
+              className="mt-5 w-full h-12 rounded-2xl font-bold text-[14px] border-2 flex items-center justify-center gap-2 transition-all hover:bg-[#fafafa] active:scale-95"
+              style={{ borderColor: T.border, color: T.dark }}>
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-4 h-4" />
+              Continue with Google
+            </button>
+
+            <p className="mt-6 text-center text-sm font-medium text-[#9a9a9a]">
               Already have account?{" "}
               <button onClick={() => navigate("/login")} className="font-black" style={{ color: T.accent }}>Sign In Instead</button>
             </p>

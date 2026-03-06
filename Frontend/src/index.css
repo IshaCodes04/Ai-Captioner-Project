@@ -55,6 +55,12 @@
     }
   }
 
+  @keyframes shine {
+    100% {
+      left: 125%;
+    }
+  }
+
   @keyframes bounce {
 
     0%,
@@ -87,8 +93,24 @@
     animation: pulse 2s ease-in-out infinite;
   }
 
+  .animate-pulse-slow {
+    animation: pulse 4s ease-in-out infinite;
+  }
+
   .animate-bounce {
     animation: bounce 1s ease-in-out infinite;
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s ease-in-out infinite;
+  }
+
+  .animate-float-slow {
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
   }
 
   /* Brand gradient text */
