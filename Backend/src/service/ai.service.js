@@ -77,8 +77,12 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
 
     const response = await ai.models.generateContent({
-      model: "gemini-flash-latest", // Switching to verified model identifier
+      model: "gemini-flash-latest",
       systemInstruction: config.systemInstruction,
+      generationConfig: {
+        maxOutputTokens: 500,
+        temperature: 0.7,
+      },
       contents: [
         {
           parts: [
