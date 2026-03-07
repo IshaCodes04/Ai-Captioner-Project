@@ -10,7 +10,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
-  // Check if user is already logged in on mount
+  
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
