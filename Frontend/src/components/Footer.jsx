@@ -105,7 +105,7 @@ const Footer = () => {
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
+                {/* Bottom Bar Created */}
                 <div className="pt-10 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: T.border }}>
                     <div className="flex items-center gap-6">
                         <p className="text-sm font-bold" style={{ color: T.muted }}>
