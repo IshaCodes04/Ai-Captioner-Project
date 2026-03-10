@@ -14,11 +14,27 @@ const Home = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
 
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", fn);
-    return () => window.removeEventListener("scroll", fn);
+    const handleMouse = (e) => {
+      setMousePos({ x: (e.clientX / window.innerWidth - 0.5) * 20, y: (e.clientY / window.innerHeight - 0.5) * 20 });
+    };
+    window.addEventListener("mousemove", handleMouse);
+    return () => window.removeEventListener("mousemove", handleMouse);
   }, []);
+
+  const simulateVision = () => {
+    if (isProcessing) return;
+    setIsProcessing(true);
+    setShowResult(false);
+    setTimeout(() => {
+      setIsProcessing(false);
+      setShowResult(true);
+    }, 2800);
+  };
 
   return (
     <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden bg-[#fafafa]" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -48,22 +64,33 @@ const Home = () => {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] opacity-20 animate-pulse-slow pointer-events-none" style={{ background: T.accent }}></div>
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none opacity-[0.03]" style={{ backgroundImage: `radial-gradient(${T.dark} 1px, transparent 1px)`, backgroundSize: '32px 32px' }}></div>
 
+        {/* Floating elements */}
+        <div className="absolute left-[5%] top-[20%] w-12 h-12 rounded-2xl bg-white shadow-xl flex items-center justify-center animate-float-particle mix-blend-multiply" style={{ transform: `translate(${mousePos.x * 0.5}px, ${mousePos.y * 0.5}px)` }}>
+          <Sparkles className="w-6 h-6" style={{ color: T.accent }} />
+        </div>
+        <div className="absolute right-[10%] top-[15%] w-10 h-10 rounded-full bg-black shadow-2xl flex items-center justify-center animate-float-slow" style={{ transform: `translate(${mousePos.x * -0.8}px, ${mousePos.y * -0.8}px)` }}>
+          <Zap className="w-5 h-5 text-white" />
+        </div>
+
         <div className="max-w-7xl mx-auto relative z-10 grid lg:grid-cols-2 gap-20 items-center">
-          <div className="animate-fadeUp">
-            <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl mb-10 text-[11px] font-black uppercase tracking-[0.2em] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#e8e0d5] transform hover:scale-105 transition-transform" style={{ color: T.accent }}>
-              <Sparkles className="w-4 h-4 fill-current" />
+          <div className="animate-fadeUp" style={{ transform: `translate(${mousePos.x * 0.2}px, ${mousePos.y * 0.2}px)` }}>
+            <div className="group inline-flex items-center gap-3 px-5 py-2.5 rounded-2xl mb-10 text-[11px] font-black uppercase tracking-[0.2em] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#e8e0d5] transform hover:scale-105 transition-all cursor-default" style={{ color: T.accent }}>
+              <Sparkles className="w-4 h-4 fill-current group-hover:rotate-12 transition-transform" />
               Next-Gen Vision AI
             </div>
 
             <h1 className="text-[84px] md:text-[96px] font-black leading-[0.9] tracking-[-0.04em] mb-10" style={{ color: T.dark }}>
               Turn Any Image<br />
-              <span className="relative inline-block">
+              <span className="relative inline-block group">
                 Into a <span style={{ color: T.accent }}>Viral Script</span>
-                <span className="absolute -bottom-2 left-0 w-full h-3 rounded-full opacity-20" style={{ background: T.accent }}></span>
+                {/* Dynamic Eye-catching Underline */}
+                <span className="absolute -bottom-2 left-0 w-full h-3 rounded-full opacity-30 z-[-1] blur-[1px]" style={{ background: `linear-gradient(90deg, transparent, ${T.accent}, transparent)` }}></span>
+                <span className="absolute -bottom-2 left-0 w-0 h-3 bg-[#c4956a] rounded-full transition-all duration-1000 group-hover:w-full opacity-40"></span>
+                <span className="absolute -bottom-3 left-0 w-full h-[2px] bg-[#c4956a]/10"></span>
               </span>
             </h1>
 
-            <div className="pl-6 border-l-[4px] mb-12 max-w-xl transition-all hover:pl-8" style={{ borderColor: T.accent }}>
+            <div className="pl-6 border-l-[4px] mb-12 max-w-xl transition-all hover:pl-10" style={{ borderColor: T.accent }}>
               <p className="text-xl md:text-[22px] font-medium leading-[1.6]" style={{ color: T.mid }}>
                 The world's most <span className="font-black" style={{ color: T.dark }}>intelligent vision engine</span> for creators. Generate captions that <span className="italic font-bold" style={{ color: T.accent }}>stop the scroll</span> and drive 10x engagement.
               </p>
@@ -81,10 +108,10 @@ const Home = () => {
               </button>
             </div>
 
-            <div className="mt-12 flex items-center gap-6 opacity-40">
+            <div className="mt-12 flex items-center gap-6 opacity-40 hover:opacity-100 transition-opacity">
               <div className="flex -space-x-3">
                 {[1, 2, 3, 4].map(i => (
-                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 shadow-sm" style={{ backgroundImage: `url(https://i.pravatar.cc/100?img=${i + 10})`, backgroundSize: 'cover' }}></div>
+                  <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-200 shadow-sm transition-transform hover:-translate-y-1" style={{ backgroundImage: `url(https://i.pravatar.cc/100?img=${i + 10})`, backgroundSize: 'cover' }}></div>
                 ))}
               </div>
               <p className="text-xs font-bold uppercase tracking-widest">Trusted by 2,000+ top creators</p>
@@ -92,8 +119,13 @@ const Home = () => {
           </div>
 
           {/* Product mockup card */}
-          <div className="relative hidden lg:block perspective-1000">
-            <div className="animate-float-slow rounded-[48px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border bg-white relative z-10" style={{ borderColor: T.border }}>
+          <div 
+            className="relative hidden lg:block perspective-1000 transition-transform duration-300 ease-out"
+            style={{ 
+              transform: `rotateY(${mousePos.x * 0.5}deg) rotateX(${mousePos.y * -0.5}deg) scale(1.02)`,
+            }}
+          >
+            <div className="rounded-[48px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.15)] border bg-white relative z-10" style={{ borderColor: T.border }}>
               {/* Chrome bar */}
               <div className="h-14 flex items-center gap-4 px-8 border-b bg-[#fcfbf9]/80 backdrop-blur-md" style={{ borderColor: T.border }}>
                 <div className="flex gap-2">
@@ -106,39 +138,64 @@ const Home = () => {
                     snapscript.ai/workspace
                   </div>
                 </div>
-                <div className="w-10"></div>
               </div>
 
-              <div className="p-12">
+              <div className="p-12 relative overflow-hidden">
+                {/* Simulated Scanning active overlay */}
+                {isProcessing && (
+                  <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] z-30 flex items-center justify-center">
+                    <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-[#c4956a] to-transparent shadow-[0_0_20px_#c4956a] animate-scan"></div>
+                    <div className="text-center">
+                      <div className="w-16 h-16 rounded-3xl bg-white shadow-2xl flex items-center justify-center mb-4 mx-auto animate-bounce">
+                        <Wand2 className="w-8 h-8 text-[#c4956a]" />
+                      </div>
+                      <p className="font-black text-xs uppercase tracking-[0.2em]" style={{ color: T.accent }}>AI Analyzing...</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-[1fr_280px] gap-8 items-start">
                   {/* Upload Area */}
-                  <div className="aspect-square rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-6 group cursor-pointer transition-all hover:bg-[#fff9f4]" style={{ borderColor: T.border, background: T.surface }}>
-                    <div className="w-20 h-20 rounded-[28px] flex items-center justify-center bg-white shadow-xl group-hover:scale-110 transition-transform">
+                  <div 
+                    onClick={simulateVision}
+                    className="aspect-square rounded-[32px] border-2 border-dashed flex flex-col items-center justify-center gap-6 group cursor-pointer transition-all hover:bg-[#fff9f4] relative overflow-hidden" 
+                    style={{ borderColor: T.border, background: T.surface }}
+                  >
+                    <div className="w-20 h-20 rounded-[28px] flex items-center justify-center bg-white shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-transform">
                       <Image className="w-10 h-10" style={{ color: T.accent }} />
                     </div>
-                    <div className="text-center">
+                    <div className="text-center group-hover:opacity-80 transition-opacity">
                       <p className="font-black text-base mb-1" style={{ color: T.dark }}>Drop image here</p>
-                      <p className="text-xs font-medium opacity-40">PNG, JPG up to 10MB</p>
+                      <p className="text-xs font-medium opacity-40">Click to test instant captioning</p>
                     </div>
+                    {/* Ripple effect on hover */}
+                    <div className="absolute bottom-0 left-0 w-full h-1 bg-[#c4956a]/10 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
                   </div>
 
                   {/* AI Output Preview */}
                   <div className="space-y-6 pt-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-black">
-                        <Zap className="w-4 h-4 fill-current text-[#c4956a]" />
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${isProcessing ? 'bg-[#c4956a] animate-pulse' : 'bg-black'}`}>
+                        <Zap className={`w-4 h-4 fill-current ${isProcessing ? 'text-white' : 'text-[#c4956a]'}`} />
                       </div>
                       <span className="font-black text-[11px] uppercase tracking-[0.2em]" style={{ color: T.dark }}>Gemini Engine</span>
                     </div>
 
-                    <div className="relative">
+                    <div className={`relative transition-all duration-700 ${showResult ? 'opacity-100 scale-100 translate-y-0' : 'opacity-20 scale-95 translate-y-4'}`}>
                       <div className="absolute -left-3 top-4 w-1 h-12 rounded-full" style={{ background: T.accent }}></div>
-                      <div className="rounded-[28px] p-6 text-[13px] leading-relaxed italic font-medium shadow-sm border border-[#e8e0d5] bg-[#fffcf9]" style={{ color: T.mid }}>
-                        "Golden hour hits different 🌅 Breathe it in. #GoldenHour #VibeCheck #Aesthetic"
+                      <div className="rounded-[28px] p-6 text-[13px] leading-relaxed italic font-bold shadow-sm border border-[#e8e0d5] bg-[#fffcf9]" style={{ color: T.mid }}>
+                        {showResult ? (
+                          <span className="animate-fadeIn">"Golden hour hits different 🌅 Breathe it in. #GoldenHour #VibeCheck #Aesthetic"</span>
+                        ) : (
+                          <span className="opacity-20">Waiting for your visual input to spark magic...</span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="w-full py-4 rounded-2xl text-white font-black text-xs flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(196,149,106,0.6)] transform hover:-translate-y-1 transition-all active:scale-95 cursor-pointer" style={{ background: T.accent }}>
+                    <div 
+                      className={`w-full py-4 rounded-2xl text-white font-black text-xs flex items-center justify-center gap-3 shadow-[0_15px_30px_-10px_rgba(196,149,106,0.6)] transform hover:-translate-y-1 transition-all active:scale-95 cursor-pointer ${showResult ? 'opacity-100' : 'opacity-40 grayscale pointer-events-none'}`} 
+                      style={{ background: T.accent }}
+                    >
                       <Copy className="w-4 h-4" /> Copy Viral Script
                     </div>
                   </div>
