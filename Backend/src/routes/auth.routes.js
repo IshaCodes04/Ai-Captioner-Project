@@ -16,7 +16,8 @@ router.post("/logout", logoutController);
 router.get("/google", passport.authenticate("google", {
     scope: ["profile", "email"],
     session: false,
-    prompt: "select_account" // This line forces the Google account selection screen!
+    prompt: "consent select_account", // Forces both consent AND account selection
+    accessType: "offline"
 }));
 
 router.get(
