@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
@@ -44,10 +45,18 @@ const App = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("user");
-    setUser(null);
-    navigate("/home");
+  const handleLogout = async () => {
+    try {
+      // Clear backend cookie
+      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+    } catch (error) {
+      console.error("Logout API error:", error);
+    } finally {
+      // Always clear local state
+      localStorage.removeItem("user");
+      setUser(null);
+      navigate("/home");
+    }
   };
 
   if (isLoading) {

@@ -42,7 +42,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden bg-[#fafafa]" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden bg-[#fafafa]" style={{ fontFamily: "'Manrope', sans-serif" }}>
 
       {/* ══ NAVBAR ══════════════════════════════════════════════ */}
       <nav className={`fixed top-0 left-0 w-full z-[120] transition-all duration-500 ${scrolled ? "py-4 bg-white/95 backdrop-blur-xl shadow-sm" : "py-5 bg-transparent"}`}>
@@ -54,7 +54,7 @@ const Home = () => {
 
             <div className="hidden lg:flex items-center gap-10">
               {[["Features", "#features"], ["How It Works", "#how"], ["Pricing", "#pricing"]].map(([l, h]) => (
-                <a key={l} href={h} className="text-[12px] font-black uppercase tracking-[0.2em] transition-all hover:text-[#c4956a]">{l}</a>
+                <a key={l} href={h} className="text-[12px] font-bold uppercase tracking-[0.25em] transition-all hover:text-[#c4956a]">{l}</a>
               ))}
             </div>
           </div>
@@ -91,7 +91,7 @@ const Home = () => {
               Next-Gen Vision AI
             </div>
 
-            <h1 className="text-[72px] md:text-[88px] font-black leading-[0.9] tracking-[-0.04em] mb-10" style={{ color: T.dark }}>
+            <h1 className="text-[72px] md:text-[88px] font-extrabold leading-[0.9] tracking-[-0.05em] mb-10" style={{ color: T.dark, fontFamily: "'Urbanist', sans-serif" }}>
               Turn Any Image<br />
               <span className="relative inline-block group">
                 Into a <span style={{ color: T.accent }}>Viral Script</span>
@@ -100,19 +100,23 @@ const Home = () => {
               </span>
             </h1>
 
-            <div className="pl-6 border-l-[4px] mb-12 max-w-xl" style={{ borderColor: T.accent }}>
-              <p className="text-xl md:text-[22px] font-medium leading-[1.6]" style={{ color: T.mid }}>
-                The world's most <span className="font-black" style={{ color: T.dark }}>intelligent vision engine</span> for creators. Generate captions that <span className="italic font-bold" style={{ color: T.accent }}>stop the scroll</span>.
+            <div className="relative pl-10 mb-12 max-w-xl group">
+              {/* Stylish Designer Line */}
+              <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#c4956a] via-[#c4956a]/40 to-transparent">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#c4956a] shadow-[0_0_15px_#c4956a] animate-pulse"></div>
+              </div>
+              <p className="text-xl md:text-[22px] font-medium leading-[1.6] group-hover:translate-x-1 transition-transform duration-500" style={{ color: T.mid }}>
+                The world's most <span className="font-extrabold" style={{ color: T.dark }}>intelligent vision engine</span> for creators. Generate captions that <span className="italic font-bold" style={{ color: T.accent }}>stop the scroll</span>.
               </p>
             </div>
 
-            <div className="flex flex-col gap-8 pt-4">
-              {/* Interactive Feature Ticker */}
+            <div className="flex flex-col gap-10 pt-4">
+              {/* Feature Tickers */}
               <div className="flex flex-wrap gap-3">
-                {["100% Free", "No Credit Card", "Gemini 1.5 Pro", "Viral Hooks"].map((tag, i) => (
+                {["100% Free", "Gemini 1.5 Pro", "Viral Hooks", "24/7 Active"].map((tag, i) => (
                   <div 
                     key={tag} 
-                    className="px-4 py-2 rounded-xl text-[11px] font-black uppercase tracking-wider border border-[#e8e0d5] bg-white shadow-sm flex items-center gap-2 hover:border-[#c4956a] hover:text-[#c4956a] transition-all cursor-default group"
+                    className="px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-[0.15em] border border-[#e8e0d5] bg-white shadow-sm flex items-center gap-2 hover:border-[#c4956a] hover:text-[#c4956a] transition-all cursor-default group"
                   >
                     <div className="w-1.5 h-1.5 rounded-full bg-[#c4956a] group-hover:animate-ping"></div>
                     {tag}
@@ -121,7 +125,7 @@ const Home = () => {
               </div>
 
               {/* Enhanced Trust Section */}
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 border-t border-[#e8e0d5]/40 pt-8 mt-2">
                 <div className="flex items-center gap-4">
                   <div className="flex -space-x-3">
                     {[1, 2, 3, 4].map(i => (
