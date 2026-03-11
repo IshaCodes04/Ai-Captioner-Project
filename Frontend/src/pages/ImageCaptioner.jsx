@@ -224,7 +224,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await axios.get("http://localhost:3000/api/posts", { withCredentials: true });
+                const res = await axios.get(`${import.meta.env.VITE_API_URL}/api/posts`, { withCredentials: true });
                 if (res.data?.posts) {
                     const formattedHistory = res.data.posts.map(p => ({
                         id: p._id,
@@ -266,7 +266,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
             const formData = new FormData();
             formData.append("image", file);
             formData.append("tone", captionStyle); // send selected tone
-            const res = await axios.post("http://localhost:3000/api/posts", formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/posts`, formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast("Caption generated! ✨");
@@ -301,7 +301,7 @@ const ImageCaptioner = ({ onLogout, user }) => {
             const formData = new FormData();
             formData.append("image", uploadedFileRef.current);
             formData.append("tone", captionStyle); // send the newly selected tone
-            const res = await axios.post("http://localhost:3000/api/posts", formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
+            const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/posts`, formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
             showToast(`${captionStyles.find(s => s.id === captionStyle)?.label} caption ready! ✨`);
@@ -343,38 +343,39 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
             {/* NAVBAR */}
             <nav className="sticky top-0 z-[100] border-b" style={{ background: "white", borderColor: T.border }}>
-                <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
-                    <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow" style={{ background: T.dark }}>
-                            <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-3 md:py-4 flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center shadow" style={{ background: T.dark }}>
+                            <Zap className="w-4 h-4 md:w-5 md:h-5 fill-current" style={{ color: T.accent }} />
                         </div>
-                        <span className="text-base md:text-lg font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
+                        <span className="text-base md:text-lg font-black tracking-tight hidden xs:block" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "#059669" }}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                    <div className="flex items-center gap-2 sm:gap-4 md:gap-6">
+                        <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", border: "1px solid rgba(52,211,153,0.2)", color: "#059669" }}>
+                            <div className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                             AI Online
                         </div>
 
-                        <div className="h-8 w-px bg-[#e8e0d5] hidden md:block"></div>
+                        <div className="h-6 w-px bg-[#e8e0d5] hidden lg:block"></div>
 
-                        <div className="flex items-center gap-2 md:gap-4">
+                        <div className="flex items-center gap-1.5 md:gap-4">
                             <button
                                 onClick={() => setActiveTab("editor")}
-                                className={`px-3 md:px-4 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all ${activeTab === "editor" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                className={`px-2.5 md:px-4 py-2 rounded-xl text-[9px] md:text-xs font-black uppercase tracking-widest transition-all ${activeTab === "editor" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                                 style={activeTab === "editor" ? { background: T.dark, color: "white" } : { color: T.dark }}
                             >
-                                Create
+                                <span className="hidden sm:inline">Create</span>
+                                <span className="sm:hidden text-[10px]">Create</span>
                             </button>
                             <button
                                 onClick={() => setActiveTab("gallery")}
-                                className={`px-3 md:px-4 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === "gallery" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                className={`px-2.5 md:px-4 py-2 rounded-xl text-[9px] md:text-xs font-black uppercase tracking-widest transition-all flex items-center gap-1.5 ${activeTab === "gallery" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                                 style={activeTab === "gallery" ? { background: T.dark, color: "white" } : { color: T.dark }}
                             >
-                                <LayoutGrid className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Your Gallery</span>
-                                <span className="sm:hidden">Gallery</span>
+                                <LayoutGrid className="w-3 h-3 md:w-3.5 md:h-3.5" />
+                                <span className="hidden sm:inline">Gallery</span>
+                                <span className="sm:hidden text-[8px]">Gallery</span>
                             </button>
                         </div>
 
@@ -382,14 +383,14 @@ const ImageCaptioner = ({ onLogout, user }) => {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowProfile(!showProfile)}
-                                    className="flex items-center gap-2.5 px-4 py-2 rounded-xl border transition-all hover:bg-white active:scale-95"
+                                    className="flex items-center gap-1.5 md:gap-2.5 px-2 md:px-4 py-2 rounded-xl border transition-all hover:bg-white active:scale-95"
                                     style={{ background: T.surface, borderColor: showProfile ? T.accent : T.border }}
                                 >
-                                    <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black text-white" style={{ background: T.accent }}>
+                                    <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg flex items-center justify-center text-[10px] md:text-xs font-black text-white" style={{ background: T.accent }}>
                                         {user.fullName?.charAt(0)?.toUpperCase() || "U"}
                                     </div>
-                                    <span className="hidden sm:inline text-sm font-semibold" style={{ color: T.mid }}>{user.fullName?.split(" ")[0]}</span>
-                                    <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${showProfile ? "rotate-180" : ""}`} style={{ color: T.muted }} />
+                                    <span className="hidden lg:inline text-sm font-semibold" style={{ color: T.mid }}>{user.fullName?.split(" ")[0]}</span>
+                                    <ChevronDown className={`w-3 h-3 md:w-3.5 md:h-3.5 transition-transform duration-300 ${showProfile ? "rotate-180" : ""}`} style={{ color: T.muted }} />
                                 </button>
 
                                 {showProfile && (
@@ -421,23 +422,22 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                 )}
                             </div>
                         )}
-
                     </div>
                 </div>
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-                <div className="mb-8 md:mb-12">
-                    <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2" style={{ color: T.dark }}>
+                <div className="mb-8 md:mb-12 text-center md:text-left">
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-3" style={{ color: T.dark }}>
                         {activeTab === "editor" ? (
                             <>Captions by <span style={{ color: T.accent }}>Image</span></>
                         ) : (
                             <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
                         )}
                     </h1>
-                    <p className="font-medium" style={{ color: T.muted }}>
+                    <p className="font-medium text-xs sm:text-sm md:text-base px-2 md:px-0" style={{ color: T.muted }}>
                         {activeTab === "editor"
-                            ? "Upload an image → AI reads the scene → Get your perfect caption"
+                            ? "Upload image → AI reads scene → Get captions"
                             : "Explore your collection of AI-generated stories and visuals"
                         }
                     </p>
@@ -501,15 +501,15 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
                             {/* Style Selector */}
                             {previewUrl && (
-                                <div className="rounded-3xl p-6 border" style={{ background: "white", borderColor: T.border }}>
-                                    <div className="flex items-center gap-2.5 mb-5">
-                                        <Sparkles className="w-4 h-4" style={{ color: T.accent }} />
-                                        <p className="font-black text-sm" style={{ color: T.dark }}>Choose Caption Tone</p>
+                                <div className="rounded-3xl p-4 md:p-6 border" style={{ background: "white", borderColor: T.border }}>
+                                    <div className="flex items-center gap-2.5 mb-4 md:mb-5">
+                                        <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: T.accent }} />
+                                        <p className="font-black text-xs md:text-sm" style={{ color: T.dark }}>Choose Caption Tone</p>
                                     </div>
-                                    <div className="grid grid-cols-5 gap-2 md:gap-3">
+                                    <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3">
                                         {captionStyles.map(style => (
                                             <button key={style.id} onClick={() => setCaptionStyle(style.id)}
-                                                className="flex flex-col items-center justify-center gap-2 py-3 md:py-4 px-1 md:px-2 rounded-2xl border font-bold text-[9px] md:text-[11px] uppercase tracking-wider transition-all active:scale-95"
+                                                className="flex flex-col items-center justify-center gap-1.5 py-3 md:py-4 px-1 md:px-2 rounded-2xl border font-bold text-[9px] md:text-[11px] uppercase tracking-wider transition-all active:scale-95"
                                                 style={captionStyle === style.id
                                                     ? { background: T.dark, borderColor: T.dark, color: "white" }
                                                     : { background: T.surface, borderColor: T.border, color: T.muted }
@@ -517,8 +517,8 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                                 onMouseEnter={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; } }}
                                                 onMouseLeave={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; } }}
                                             >
-                                                {React.cloneElement(style.icon, { className: "w-4 h-4 md:w-5 md:h-5" })}
-                                                <span className="truncate w-full text-center px-1">{style.label}</span>
+                                                {React.cloneElement(style.icon, { className: "w-3.5 h-3.5 md:w-5 md:h-5" })}
+                                                <span className="truncate w-full text-center px-0.5">{style.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -528,32 +528,32 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
                         {/* OUTPUT */}
                         <div className="flex flex-col gap-6">
-                            <div className="flex-grow rounded-3xl p-5 md:p-8 border flex flex-col min-h-[400px] md:min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
+                            <div className="flex-grow rounded-3xl p-4 sm:p-6 md:p-8 border flex flex-col min-h-[380px] md:min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
                                 <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="flex items-center gap-2.5">
                                         <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
-                                            <Sparkles className="w-4 h-4 md:w-5 md:h-5" style={{ color: T.accent }} />
+                                            <Sparkles className="w-3.5 h-3.5 md:w-4 md:h-4" style={{ color: T.accent }} />
                                         </div>
-                                        <p className="font-black text-sm md:text-base" style={{ color: T.dark }}>AI Output</p>
+                                        <p className="font-black text-xs md:text-base" style={{ color: T.dark }}>AI Output</p>
                                     </div>
                                     {caption && (
-                                        <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", color: "#059669", border: "1px solid rgba(52,211,153,0.2)" }}>Ready</div>
+                                        <div className="px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", color: "#059669", border: "1px solid rgba(52,211,153,0.2)" }}>Ready</div>
                                     )}
                                 </div>
 
                                 <div className="flex-grow flex flex-col justify-center">
                                     {isGenerating ? (
-                                        <div className="flex flex-col items-center gap-6 py-12 text-center">
-                                            <div className="relative w-16 h-16">
-                                                <div className="absolute inset-0 border-4 rounded-full" style={{ borderColor: `rgba(196,149,106,0.15)` }}></div>
-                                                <div className="absolute inset-0 border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${T.accent} transparent transparent transparent` }}></div>
+                                        <div className="flex flex-col items-center gap-5 md:gap-6 py-8 md:py-12 text-center">
+                                            <div className="relative w-12 h-12 md:w-16 md:h-16">
+                                                <div className="absolute inset-0 border-[3px] md:border-4 rounded-full" style={{ borderColor: `rgba(196,149,106,0.15)` }}></div>
+                                                <div className="absolute inset-0 border-[3px] md:border-4 border-t-transparent rounded-full animate-spin" style={{ borderColor: `${T.accent} transparent transparent transparent` }}></div>
                                             </div>
                                             <div>
-                                                <p className="text-xl font-black mb-2" style={{ color: T.dark }}>Analyzing image...</p>
-                                                <p className="font-medium text-sm" style={{ color: T.muted }}>AI is reading the scene, mood &amp; context</p>
+                                                <p className="text-lg md:text-xl font-black mb-1.5 md:mb-2" style={{ color: T.dark }}>Analyzing image...</p>
+                                                <p className="font-medium text-[10px] md:text-sm max-w-[200px] md:max-w-none mx-auto opacity-50">AI is reading the scene, mood & context</p>
                                             </div>
-                                            <div className="flex gap-2">
-                                                {[0, 1, 2].map(i => <div key={i} className="w-2 h-2 rounded-full animate-bounce" style={{ background: T.accent, animationDelay: `${i * 0.15}s` }}></div>)}
+                                            <div className="flex gap-1.5 md:gap-2">
+                                                {[0, 1, 2].map(i => <div key={i} className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full animate-bounce" style={{ background: T.accent, animationDelay: `${i * 0.15}s` }}></div>)}
                                             </div>
                                         </div>
                                     ) : caption ? (
@@ -563,11 +563,11 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                             onRegenerateClick={generateCaption}
                                         />
                                     ) : (
-                                        <div className="flex flex-col items-center gap-4 py-12 text-center opacity-40">
-                                            <Sparkles className="w-16 h-16 animate-float" style={{ color: T.border }} />
+                                        <div className="flex flex-col items-center gap-4 py-8 md:py-12 text-center opacity-30">
+                                            <Sparkles className="w-12 h-12 md:w-16 md:h-16 animate-float" style={{ color: T.border }} />
                                             <div>
-                                                <p className="text-lg font-black mb-1" style={{ color: T.muted }}>No caption yet</p>
-                                                <p className="font-medium text-sm" style={{ color: T.border }}>Upload an image to get started</p>
+                                                <p className="text-base md:text-lg font-black mb-1" style={{ color: T.muted }}>No caption yet</p>
+                                                <p className="font-medium text-[10px] md:text-sm" style={{ color: T.border }}>Upload image to get started</p>
                                             </div>
                                         </div>
                                     )}
@@ -575,13 +575,13 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
                                 {previewUrl && !isGenerating && (
                                     <button onClick={generateCaption}
-                                        className="mt-6 w-full py-4 rounded-2xl font-black text-base flex items-center justify-center gap-3 text-white shadow-lg active:scale-[0.98] transition-all"
+                                        className="mt-6 w-full py-4 rounded-2xl font-black text-sm md:text-base flex items-center justify-center gap-3 text-white shadow-lg active:scale-[0.98] transition-all"
                                         style={{ background: T.dark }}
                                         onMouseEnter={e => e.currentTarget.style.background = T.accent}
                                         onMouseLeave={e => e.currentTarget.style.background = T.dark}
                                     >
-                                        <Sparkles className="w-5 h-5" />
-                                        {caption ? `Regenerate (${captionStyles.find(s => s.id === captionStyle)?.label})` : "Generate Caption"}
+                                        <Sparkles className="w-4 h-4 md:w-5 md:h-5" />
+                                        {caption ? `Regenerate Style` : "Generate Caption"}
                                     </button>
                                 )}
                             </div>

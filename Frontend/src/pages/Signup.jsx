@@ -21,7 +21,7 @@ const Signup = ({ onSignupSuccess }) => {
     setLoading(true);
     console.log("Attempting signup with:", formData.email);
     try {
-      const res = await axios.post("http://localhost:3000/api/auth/register", formData, { withCredentials: true });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/register`, formData, { withCredentials: true });
       localStorage.setItem("user", JSON.stringify(res.data.user));
       if (onSignupSuccess) onSignupSuccess();
       navigate("/captions-by-image");
@@ -142,7 +142,7 @@ const Signup = ({ onSignupSuccess }) => {
             </div>
 
             <button
-              onClick={() => window.location.href = "http://localhost:3000/api/auth/google"}
+              onClick={() => window.location.href = `${import.meta.env.VITE_API_URL}/api/auth/google`}
               className="mt-5 w-full h-12 rounded-2xl font-bold text-[14px] border-2 flex items-center justify-center gap-2 transition-all hover:bg-[#fafafa] active:scale-95"
               style={{ borderColor: T.border, color: T.dark }}>
               <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" className="w-4 h-4" />

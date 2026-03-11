@@ -51,7 +51,7 @@ const App = () => {
   const handleLogout = async () => {
     try {
       // Clear backend cookie
-      await axios.post("http://localhost:3000/api/auth/logout", {}, { withCredentials: true });
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/logout`, {}, { withCredentials: true });
     } catch (error) {
       console.error("Logout API error:", error);
     } finally {
