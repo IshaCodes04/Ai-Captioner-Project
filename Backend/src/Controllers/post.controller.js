@@ -18,26 +18,38 @@ async function createPostController(req, res) {
     const base64Image = Buffer.from(file.buffer).toString("base64");
 
     // Pehle jaisa Simple sequential execution
-    console.log("Generating caption with AI...");
+    console.log("--- START POST CREATION ---");
+    console.log("1. AI Generation Starting...");
     const caption = await generateCaptions(base64Image, tone);
+    console.log("✅ AI Caption generated:", caption.substring(0, 30) + "...");
     
-    console.log("Uploading to ImageKit...");
+    console.log("2. Image Upload Starting...");
     const uploadResult = await uploadFile(file.buffer, `${uuidv4()}`);
+    console.log("✅ Image uploaded to URL:", uploadResult.url);
 
-    console.log("Saving to DB...");
+    console.log("3. Saving to MongoDB...");
     const post = await postModel.create({
       caption: caption,
       image: uploadResult.url,
       tone: tone,
       user: req.user._id,
     });
+    console.log("✅ Post saved to DB ID:", post._id);
+
+    console.log("--- POST CREATION SUCCESSFUL ---");
 
     res.status(201).json({
       message: "Post Created Successfully",
       post,
     });
   } catch (error) {
-    console.error("Error creating post:", error);
+    console.error("❌ CRITICAL ERROR IN POST CREATION:", error);
+    
+    // Log to file for persistent debugging
+    const fs = require('fs');
+    const logMsg = `\n[${new Date().toLocaleString()}] ERROR: ${error.message}\nSTACK: ${error.stack}\n`;
+    fs.appendFileSync('error_debug.log', logMsg);
+
     res.status(500).json({
       message: "Error creating post",
       error: error.message,
