@@ -22,7 +22,7 @@ router.get("/google", passport.authenticate("google", {
 
 router.get(
     "/google/callback",
-    passport.authenticate("google", { session: false, failureRedirect: "http://localhost:5173/login" }),
+    passport.authenticate("google", { session: false, failureRedirect: `${process.env.FRONTEND_URL || "http://localhost:5173"}/login` }),
     (req, res) => {
         // Generate JWT token
         const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
@@ -44,7 +44,7 @@ router.get(
         };
 
         const userDataStr = encodeURIComponent(JSON.stringify(userObj));
-        res.redirect(`http://localhost:5173/login?googleData=${userDataStr}`);
+        res.redirect(`${process.env.FRONTEND_URL || "http://localhost:5173"}/login?googleData=${userDataStr}`);
     }
 );
 
