@@ -20,10 +20,23 @@ async function createPostController(req, res) {
     // Run AI Generation and Image Upload in PARALLEL to save time
     console.log("⚡ Starting AI generation and Image upload in parallel...");
     
-    const [caption, uploadResult] = await Promise.all([
-      generateCaptions(base64Image, tone),
-      uploadFile(file.buffer, `${uuidv4()}`)
-    ]);
+    let caption, uploadResult;
+    try {
+      const results = await Promise.all([
+        generateCaptions(base64Image, tone).catch(err => { 
+          console.error("❌ AI Error:", err.message);
+          throw new Error("AI_FAILED: " + err.message); 
+        }),
+        uploadFile(file.buffer, `${uuidv4()}`).catch(err => { 
+          console.error("❌ Upload Error:", err.message);
+          throw new Error("UPLOAD_FAILED: " + err.message); 
+        })
+      ]);
+      caption = results[0];
+      uploadResult = results[1];
+    } catch (parallelError) {
+      throw parallelError; // caught by outer catch
+    }
 
     console.log("✅ AI & Upload completed!");
 
@@ -41,12 +54,22 @@ async function createPostController(req, res) {
       post,
     });
   } catch (error) {
-    const fs = require('fs');
-    const logMsg = `\n[${new Date().toISOString()}] Error: ${error.message}\nStack: ${error.stack}\n`;
-    fs.appendFileSync('error_debug.log', logMsg);
     console.error("Detailed Error in createPostController:", error);
+    
+    // Log to file for persistent debugging
+    const fs = require('fs');
+    const logMsg = `\n[${new Date().toISOString()}] Error: ${error.message}\n`;
+    fs.appendFileSync('error_debug.log', logMsg);
+
+    let userMessage = "Error creating post";
+    if (error.message.includes("AI_FAILED")) {
+      userMessage = "AI Generation failed. Please check your Gemini API key or image format.";
+    } else if (error.message.includes("UPLOAD_FAILED")) {
+      userMessage = "Image upload failed. Please check your ImageKit credentials.";
+    }
+
     res.status(500).json({
-      message: "Error creating post",
+      message: userMessage,
       error: error.message,
     });
   }

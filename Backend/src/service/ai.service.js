@@ -75,26 +75,31 @@ const TONE_CONFIG = {
 async function generateCaptions(base64ImageFile, tone = "casual") {
   try {
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const response = await ai.models.generateContent({
-      model: "gemini-flash-latest",
-      systemInstruction: config.systemInstruction,
-      generationConfig: {
-        maxOutputTokens: 500,
-        temperature: 0.7,
-      },
-      contents: [
-        {
-          parts: [
-            { text: config.userPrompt },
-            { inlineData: { mimeType: "image/jpeg", data: base64ImageFile } }
-          ]
+    const result = await model.generateContent([
+      { text: config.systemInstruction + "\n\n" + config.userPrompt },
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: base64ImageFile
         }
-      ]
-    });
+      }
+    ]);
 
-    // Unified SDK uses this structure for text extraction
-    const captionText = response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let captionText = "";
+    try {
+      captionText = result.response.text();
+    } catch (e) {
+      console.error("AI response text extraction failed:", e.message);
+      // Check if it was blocked
+      if (result.response.promptFeedback?.blockReason) {
+        return "Sorry, I couldn't generate a caption for this image due to safety filters.";
+      }
+      throw e;
+    }
+
+    console.log("AI Response received:", captionText.substring(0, 50) + "...");
     return captionText;
   } catch (error) {
     console.error("Error generating caption:", error);
