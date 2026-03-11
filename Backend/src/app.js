@@ -9,6 +9,9 @@ const path = require("path");
 
 const app = express();
 
+// Trust proxy for Render/proxies to handle https correctly in OAuth/Sessions
+app.set('trust proxy', 1);
+
 // CORS configuration
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:5173",
