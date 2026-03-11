@@ -74,35 +74,43 @@ const TONE_CONFIG = {
 
 async function generateCaptions(base64ImageFile, tone = "casual") {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is missing in server environment variables.");
+    }
+
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
     const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    const result = await model.generateContent([
-      { text: config.systemInstruction + "\n\n" + config.userPrompt },
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64ImageFile
-        }
-      }
-    ]);
+    // Using the most explicit and stable format for the request
+    const result = await model.generateContent({
+      contents: [{
+        parts: [
+          { text: config.systemInstruction + "\n\n" + config.userPrompt },
+          { 
+            inlineData: { 
+              mimeType: "image/jpeg", 
+              data: base64ImageFile 
+            } 
+          }
+        ]
+      }]
+    });
 
     let captionText = "";
     try {
       captionText = result.response.text();
     } catch (e) {
       console.error("AI response text extraction failed:", e.message);
-      // Check if it was blocked
       if (result.response.promptFeedback?.blockReason) {
-        return "Sorry, I couldn't generate a caption for this image due to safety filters.";
+        return "I'm sorry, but I can't generate a caption for this image due to safety filters. Please try another image.";
       }
-      throw e;
+      throw new Error("Unable to extract text from AI response.");
     }
 
     console.log("AI Response received:", captionText.substring(0, 50) + "...");
     return captionText;
   } catch (error) {
-    console.error("Error generating caption:", error);
+    console.error("Detailed Gemini API Error:", error);
     throw new Error("Failed to generate caption: " + error.message);
   }
 }
