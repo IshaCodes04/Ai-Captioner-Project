@@ -38,7 +38,7 @@ const Signup = ({ onSignupSuccess }) => {
 
       {/* ── EXTREME LEFT BUTTON ── */}
       <button onClick={() => navigate("/home")}
-        className="fixed top-6 left-6 md:top-10 md:left-10 z-[100] flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
+        className="absolute top-6 left-6 md:top-10 md:left-10 z-[100] flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-opacity"
         style={{ color: T.dark }}>
         <ChevronLeft className="w-4 h-4" /> <span className="hidden sm:inline">Back to Home</span><span className="sm:hidden">Home</span>
       </button>
@@ -65,7 +65,7 @@ const Signup = ({ onSignupSuccess }) => {
       </div>
 
       {/* ── RIGHT PANEL ── */}
-      <div className="flex-1 flex flex-col justify-center items-center px-8 relative py-6 overflow-y-auto">
+      <div className="flex-1 flex flex-col justify-center items-center px-8 relative pt-20 pb-10 md:py-6 overflow-y-auto">
         <div className="w-full max-w-[480px] animate-fadeUp my-auto">
           <div className="bg-white rounded-[24px] md:rounded-[32px] p-6 md:p-10 border border-[#e8e0d5] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)]">
             <div className="mb-6 text-center">

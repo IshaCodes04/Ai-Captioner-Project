@@ -138,8 +138,8 @@ const Home = () => {
               Next-Gen Vision AI
             </div>
 
-            <h1 className="text-[52px] md:text-[68px] lg:text-[88px] font-extrabold leading-[0.9] tracking-[-0.05em] mb-10" style={{ color: T.dark, fontFamily: "'Urbanist', sans-serif" }}>
-              Turn Any Image<br />
+            <h1 className="text-[40px] xs:text-[48px] md:text-[68px] lg:text-[88px] font-extrabold leading-[1.1] md:leading-[0.9] tracking-[-0.05em] mb-10 px-4 md:px-0" style={{ color: T.dark, fontFamily: "'Urbanist', sans-serif" }}>
+              Turn Any Image<br className="hidden xs:block" />
               <span className="relative inline-block group">
                 Into a <span style={{ color: T.accent }}>Viral Script</span>
                 <span className="absolute -bottom-2 left-0 w-full h-3 rounded-full opacity-30 z-[-1] blur-[1px]" style={{ background: `linear-gradient(90deg, transparent, ${T.accent}, transparent)` }}></span>
