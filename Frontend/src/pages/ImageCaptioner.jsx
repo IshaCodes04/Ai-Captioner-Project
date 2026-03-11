@@ -255,17 +255,48 @@ const ImageCaptioner = ({ onLogout, user }) => {
         setTimeout(() => setToast({ show: false, message: "", type: "success" }), 3000);
     };
 
+    // Helper to compress image (Crucial for Mobile/Slow Internet)
+    const compressImage = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const MAX_WIDTH = 1200;
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name, { type: "image/jpeg" }));
+                    }, "image/jpeg", 0.7);
+                };
+            };
+        });
+    };
+
     const handleFile = async (file) => {
         if (!file || !file.type.startsWith("image/")) { showToast("Please upload a valid image file", "error"); return; }
-        if (file.size > 10 * 1024 * 1024) { showToast("File must be under 10MB", "error"); return; }
-        uploadedFileRef.current = file; // save for regeneration
+        
+        setIsGenerating(true);
         setPreviewUrl(URL.createObjectURL(file));
         setCaption("");
-        setIsGenerating(true);
+
         try {
+            let fileToUpload = file;
+            if (file.size > 1 * 1024 * 1024) { // If > 1MB
+                showToast("Optimizing for mobile speed...");
+                fileToUpload = await compressImage(file);
+            }
+
+            uploadedFileRef.current = fileToUpload;
             const formData = new FormData();
-            formData.append("image", file);
-            formData.append("tone", captionStyle); // send selected tone
+            formData.append("image", fileToUpload);
+            formData.append("tone", captionStyle);
             const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/posts`, formData, { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true });
             const gen = res.data?.post?.caption || "";
             setCaption(gen);
