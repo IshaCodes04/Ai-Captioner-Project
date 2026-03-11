@@ -40,85 +40,40 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="w-full pt-12 md:pt-20 pb-10 border-t" style={{ background: "white", borderColor: T.border }}>
+        <footer className="w-full pt-12 pb-10 border-t" style={{ background: "white", borderColor: T.border }}>
             <div className="max-w-7xl mx-auto px-6 md:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 md:mb-20">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-12">
 
                     {/* Brand Section */}
-                    <div className="lg:col-span-4 space-y-8">
+                    <div className="lg:col-span-12 flex flex-col items-center text-center space-y-6">
                         <div className="cursor-pointer" onClick={() => navigate("/home")}>
-                            <Logo size={40} />
+                            <Logo size={32} />
                         </div>
 
-                        <p className="text-base font-medium leading-relaxed max-w-sm" style={{ color: T.mid }}>
-                            The premium AI engine for creators. Turn visual stories into viral scripts with one click using Gemini Vision AI.
+                        <p className="text-sm font-medium leading-relaxed max-w-sm opacity-50" style={{ color: T.mid }}>
+                            Premium AI vision engine for creators.
                         </p>
 
                         <div className="flex items-center gap-4">
                             {socials.map((social, i) => (
-                                <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl border flex items-center justify-center transition-all hover:-translate-y-1"
-                                    style={{ borderColor: T.border, color: T.muted }}
-                                    onMouseEnter={e => { e.currentTarget.style.color = T.accent; e.currentTarget.style.borderColor = T.accent; }}
-                                    onMouseLeave={e => { e.currentTarget.style.color = T.muted; e.currentTarget.style.borderColor = T.border; }}>
+                                <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-xl border flex items-center justify-center transition-all hover:-translate-y-1"
+                                    style={{ borderColor: T.border, color: T.muted }}>
                                     {social.icon}
                                 </a>
                             ))}
                         </div>
                     </div>
-
-                    {/* Links Sections */}
-                    <div className="lg:col-span-5 grid grid-cols-2 sm:grid-cols-3 gap-8">
-                        {Object.entries(footerLinks).map(([title, links]) => (
-                            <div key={title} className="space-y-6">
-                                <h4 className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: T.dark }}>{title}</h4>
-                                <ul className="space-y-4">
-                                    {links.map((link, i) => (
-                                        <li key={i}>
-                                            <a href={link.path} className="text-[15px] font-medium transition-colors hover:translate-x-1 inline-block"
-                                                style={{ color: T.mid }}
-                                                onMouseEnter={e => e.currentTarget.style.color = T.accent}
-                                                onMouseLeave={e => e.currentTarget.style.color = T.mid}>
-                                                {link.name}
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Newsletter Section */}
-                    <div className="lg:col-span-3 space-y-6">
-                        <h4 className="text-xs font-black uppercase tracking-[0.2em]" style={{ color: T.dark }}>Stay Updated</h4>
-                        <p className="text-sm font-medium" style={{ color: T.muted }}>Get the latest AI tips and updates directly to your inbox.</p>
-                        <div className="relative">
-                            <input type="email" placeholder="email@example.com"
-                                className="w-full px-5 py-4 rounded-2xl border bg-transparent font-medium text-sm focus:outline-none transition-all"
-                                style={{ borderColor: T.border, color: T.dark }}
-                                onFocus={e => e.currentTarget.style.borderColor = T.accent}
-                                onBlur={e => e.currentTarget.style.borderColor = T.border} />
-                            <button className="absolute right-2 top-2 bottom-2 w-10 h-10 rounded-xl flex items-center justify-center text-white transition-all active:scale-95"
-                                style={{ background: T.dark }}>
-                                <ArrowRight className="w-4 h-4" />
-                            </button>
-                        </div>
-                    </div>
                 </div>
 
-                {/* Bottom Bar Created */}
-                <div className="pt-10 border-t flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left" style={{ borderColor: T.border }}>
+                {/* Bottom Bar */}
+                <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left" style={{ borderColor: T.border }}>
+                    <p className="text-xs font-bold opacity-40" style={{ color: T.muted }}>
+                        © 2026 SnapScript. Built by {T.dark} Isha Singh
+                    </p>
                     <div className="flex items-center gap-6">
-                        <p className="text-sm font-bold" style={{ color: T.muted }}>
-                            © 2026 SnapScript. Built by <span style={{ color: T.dark }}>Isha Singh</span>
-                        </p>
-                    </div>
-                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
                         <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                            <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#059669" }}>System Status: Operational</span>
-                        </div>
-                        <div className="flex items-center gap-4 text-xs font-bold" style={{ color: T.muted }}>
-                            <span>English (US)</span>
+                            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                            <span className="text-[9px] font-black uppercase tracking-widest opacity-40" style={{ color: "#059669" }}>System: Operational</span>
                         </div>
                     </div>
                 </div>
