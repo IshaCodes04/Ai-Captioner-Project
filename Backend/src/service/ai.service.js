@@ -16,7 +16,7 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
     if (!apiKey) throw new Error("API Key Missing");
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-8b" });
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
     const instruction = TONE_CONFIG[tone] || TONE_CONFIG.casual;
     const fullPrompt = `${instruction}\n\nFormat your response as a list with bullet points.`;
