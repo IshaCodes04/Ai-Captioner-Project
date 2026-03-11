@@ -22,8 +22,8 @@ async function createPostController(req, res) {
     
     let caption, uploadResult;
     try {
-      const results = await Promise.all([
-        generateCaptions(base64Image, tone).catch(err => { 
+      [caption, uploadResult] = await Promise.all([
+        generateCaptions(base64Image, tone, file.mimetype).catch(err => { 
           console.error("❌ AI Error:", err.message);
           throw new Error("AI_FAILED: " + err.message); 
         }),
@@ -32,8 +32,6 @@ async function createPostController(req, res) {
           throw new Error("UPLOAD_FAILED: " + err.message); 
         })
       ]);
-      caption = results[0];
-      uploadResult = results[1];
     } catch (parallelError) {
       throw parallelError; // caught by outer catch
     }

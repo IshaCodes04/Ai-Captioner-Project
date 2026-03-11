@@ -72,46 +72,49 @@ const TONE_CONFIG = {
   },
 };
 
-async function generateCaptions(base64ImageFile, tone = "casual") {
+async function generateCaptions(base64ImageFile, tone = "casual", mimeType = "image/jpeg") {
   try {
-    if (!process.env.GEMINI_API_KEY) {
-      throw new Error("GEMINI_API_KEY is missing in server environment variables.");
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is not defined in environment variables.");
     }
 
+    // Re-initialize to ensure fresh ENV pick-up
+    const genAI = new GoogleGenAI(apiKey);
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
-    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Using the most explicit and stable format for the request
-    const result = await model.generateContent({
-      contents: [{
-        parts: [
-          { text: config.systemInstruction + "\n\n" + config.userPrompt },
-          { 
-            inlineData: { 
-              mimeType: "image/jpeg", 
-              data: base64ImageFile 
-            } 
-          }
-        ]
-      }]
-    });
-
-    let captionText = "";
-    try {
-      captionText = result.response.text();
-    } catch (e) {
-      console.error("AI response text extraction failed:", e.message);
-      if (result.response.promptFeedback?.blockReason) {
-        return "I'm sorry, but I can't generate a caption for this image due to safety filters. Please try another image.";
+    // Build the parts array accurately
+    const prompt = `${config.systemInstruction}\n\nTask: ${config.userPrompt}`;
+    
+    const result = await model.generateContent([
+      { text: prompt },
+      {
+        inlineData: {
+          mimeType: mimeType,
+          data: base64ImageFile
+        }
       }
-      throw new Error("Unable to extract text from AI response.");
+    ]);
+
+    const response = await result.response;
+    const captionText = response.text();
+    
+    if (!captionText) {
+      throw new Error("AI returned an empty response.");
     }
 
-    console.log("AI Response received:", captionText.substring(0, 50) + "...");
+    console.log("✅ AI Response successful");
     return captionText;
+
   } catch (error) {
-    console.error("Detailed Gemini API Error:", error);
-    throw new Error("Failed to generate caption: " + error.message);
+    console.error("❌ Gemini Service Error:", error.message);
+    // Specific error handling for more clarity
+    if (error.message.includes("403")) throw new Error("API Key is invalid or restricted.");
+    if (error.message.includes("429")) throw new Error("Rate limit exceeded. Try again later.");
+    if (error.message.includes("location")) throw new Error("Gemini is not available in your server's region.");
+    
+    throw new Error("AI Error: " + error.message);
   }
 }
 
