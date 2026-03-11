@@ -1,44 +1,46 @@
-const { GoogleGenAI } = require("@google/genai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 
 // Tone-specific instructions for Gemini
 const TONE_CONFIG = {
   casual: {
-    systemInstruction: "You are a social media expert who writes fun, relatable, everyday captions. Write 4-5 short casual captions for the image. Use a friendly, conversational tone — like you're texting a friend. Add relevant emojis naturally. Keep each caption under 15 words. Format: **Casual Vibes**\n* caption1\n* caption2",
+    systemInstruction: "You are a social media expert who writes fun, relatable, everyday captions. Write 4-5 short casual captions for the image. Use a friendly, conversational tone. Add relevant emojis. Keep each under 15 words. Format: **Casual Vibes**\n* caption",
     userPrompt: "Write casual, relatable social media captions for this image.",
   },
   funny: {
-    systemInstruction: "You are a witty comedian who writes hilarious, punny captions for social media. Write 4-5 funny captions for the image. Use humor, sarcasm, puns. Format: **Comedy Central**\n* caption1",
+    systemInstruction: "You are a witty comedian who writes hilarious captions. Use humor and puns. Format: **Comedy Central**\n* caption",
     userPrompt: "Write funny, witty, humorous captions for this image.",
   },
   professional: {
-    systemInstruction: "You are a professional LinkedIn content creator. Write 4-5 polished, professional captions. No slang. Format: **Professional**\n* caption1",
+    systemInstruction: "You are a professional LinkedIn strategist. Write polished, professional captions. No slang. Use hashtags. Format: **Professional**\n* caption",
     userPrompt: "Write professional, brand-ready captions for this image.",
   },
   poetic: {
-    systemInstruction: "You are a creative poet. Write 4-5 poetic, lyrical captions. Use metaphors. Format: **Poetic**\n* caption1",
-    userPrompt: "Write poetic, lyrical, and emotionally expressive captions for this image.",
+    systemInstruction: "You are a creative poet. Write beautiful, lyrical captions using metaphors. Format: **Poetic**\n* caption",
+    userPrompt: "Write poetic, lyrical captions for this image.",
   },
   hashtags: {
-    systemInstruction: "You are an Instagram growth expert. Write 1 punchy caption followed by 15-20 hashtags. Format: **Caption**\n* text\n**Hashtags**\n* #tag1",
-    userPrompt: "Generate a caption and a full set of relevant hashtags for this image.",
+    systemInstruction: "You are an Instagram expert. Write 1 caption and 15-20 hashtags. Format: **Caption**\n* text\n**Hashtags**\n* #tags",
+    userPrompt: "Generate a caption and hashtags for this image.",
   },
 };
 
 async function generateCaptions(base64ImageFile, tone = "casual") {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("GEMINI_API_KEY is missing");
+    if (!apiKey) throw new Error("GEMINI_API_KEY is missing from environment");
 
-    const genAI = new GoogleGenAI(apiKey);
+    const genAI = new GoogleGenerativeAI(apiKey);
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    // Combine instructions into one prompt to avoid SDK version issues
-    const fullPrompt = `${config.systemInstruction}\n\n${config.userPrompt}`;
+    
+    // Official syntax for system instructions and model name
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      systemInstruction: config.systemInstruction
+    });
 
     const result = await model.generateContent([
-      fullPrompt,
+      { text: config.userPrompt },
       {
         inlineData: {
           mimeType: "image/jpeg",
@@ -50,14 +52,14 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
     const response = await result.response;
     const text = response.text();
     
-    if (!text) throw new Error("Empty response from AI");
+    if (!text) throw new Error("AI returned an empty response");
     
     console.log("✅ AI Caption generated successfully");
     return text;
 
   } catch (error) {
-    console.error("❌ Gemini API Error:", error);
-    throw new Error("AI Generation failed: " + error.message);
+    console.error("❌ Gemini SDK Error:", error);
+    throw new Error("Failed to generate caption: " + error.message);
   }
 }
 
