@@ -40,9 +40,9 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="w-full pt-20 pb-10 border-t" style={{ background: "white", borderColor: T.border }}>
-            <div className="max-w-7xl mx-auto px-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 mb-20">
+        <footer className="w-full pt-12 md:pt-20 pb-10 border-t" style={{ background: "white", borderColor: T.border }}>
+            <div className="max-w-7xl mx-auto px-6 md:px-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8 mb-16 md:mb-20">
 
                     {/* Brand Section */}
                     <div className="lg:col-span-4 space-y-8">
@@ -106,13 +106,13 @@ const Footer = () => {
                 </div>
 
                 {/* Bottom Bar Created */}
-                <div className="pt-10 border-t flex flex-col md:flex-row justify-between items-center gap-6" style={{ borderColor: T.border }}>
+                <div className="pt-10 border-t flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left" style={{ borderColor: T.border }}>
                     <div className="flex items-center gap-6">
                         <p className="text-sm font-bold" style={{ color: T.muted }}>
                             © 2026 SnapScript. Built by <span style={{ color: T.dark }}>Isha Singh</span>
                         </p>
                     </div>
-                    <div className="flex items-center gap-8">
+                    <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
                         <div className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                             <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: "#059669" }}>System Status: Operational</span>

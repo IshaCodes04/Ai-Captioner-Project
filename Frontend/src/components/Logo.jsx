@@ -43,7 +43,7 @@ const Logo = ({ size = 36, textVisible = true, theme = "dark" }) => {
             {/* Text */}
             {textVisible && (
                 <span
-                    className="text-xl font-black tracking-tighter"
+                    className="text-lg md:text-xl font-black tracking-tighter"
                     style={{
                         color: theme === "dark" || theme === "light" ? darkColor : "white",
                     }}

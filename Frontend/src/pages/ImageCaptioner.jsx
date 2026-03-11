@@ -343,12 +343,12 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
             {/* NAVBAR */}
             <nav className="sticky top-0 z-[100] border-b" style={{ background: "white", borderColor: T.border }}>
-                <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+                <div className="max-w-7xl mx-auto px-4 md:px-8 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-2.5">
                         <div className="w-9 h-9 rounded-xl flex items-center justify-center shadow" style={{ background: T.dark }}>
                             <Zap className="w-5 h-5 fill-current" style={{ color: T.accent }} />
                         </div>
-                        <span className="text-lg font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
+                        <span className="text-base md:text-lg font-black tracking-tight" style={{ color: T.dark }}>Snap<span style={{ color: T.accent }}>Script</span></span>
                     </div>
 
                     <div className="flex items-center gap-6">
@@ -359,21 +359,22 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
                         <div className="h-8 w-px bg-[#e8e0d5] hidden md:block"></div>
 
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 md:gap-4">
                             <button
                                 onClick={() => setActiveTab("editor")}
-                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "editor" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                className={`px-3 md:px-4 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all ${activeTab === "editor" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                                 style={activeTab === "editor" ? { background: T.dark, color: "white" } : { color: T.dark }}
                             >
                                 Create
                             </button>
                             <button
                                 onClick={() => setActiveTab("gallery")}
-                                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === "gallery" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
+                                className={`px-3 md:px-4 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === "gallery" ? "shadow-md scale-105" : "opacity-50 hover:opacity-100"}`}
                                 style={activeTab === "gallery" ? { background: T.dark, color: "white" } : { color: T.dark }}
                             >
                                 <LayoutGrid className="w-3.5 h-3.5" />
-                                Your Gallery
+                                <span className="hidden sm:inline">Your Gallery</span>
+                                <span className="sm:hidden">Gallery</span>
                             </button>
                         </div>
 
@@ -425,9 +426,9 @@ const ImageCaptioner = ({ onLogout, user }) => {
                 </div>
             </nav>
 
-            <main className="max-w-7xl mx-auto px-8 py-12">
-                <div className="mb-12">
-                    <h1 className="text-4xl font-black tracking-tight mb-2" style={{ color: T.dark }}>
+            <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
+                <div className="mb-8 md:mb-12">
+                    <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-2" style={{ color: T.dark }}>
                         {activeTab === "editor" ? (
                             <>Captions by <span style={{ color: T.accent }}>Image</span></>
                         ) : (
@@ -505,10 +506,10 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                         <Sparkles className="w-4 h-4" style={{ color: T.accent }} />
                                         <p className="font-black text-sm" style={{ color: T.dark }}>Choose Caption Tone</p>
                                     </div>
-                                    <div className="grid grid-cols-5 gap-3">
+                                    <div className="grid grid-cols-5 gap-2 md:gap-3">
                                         {captionStyles.map(style => (
                                             <button key={style.id} onClick={() => setCaptionStyle(style.id)}
-                                                className="flex flex-col items-center gap-2 py-4 px-2 rounded-2xl border font-bold text-[11px] uppercase tracking-wider transition-all active:scale-95"
+                                                className="flex flex-col items-center justify-center gap-2 py-3 md:py-4 px-1 md:px-2 rounded-2xl border font-bold text-[9px] md:text-[11px] uppercase tracking-wider transition-all active:scale-95"
                                                 style={captionStyle === style.id
                                                     ? { background: T.dark, borderColor: T.dark, color: "white" }
                                                     : { background: T.surface, borderColor: T.border, color: T.muted }
@@ -516,8 +517,8 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                                 onMouseEnter={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.accent; e.currentTarget.style.color = T.accent; } }}
                                                 onMouseLeave={e => { if (captionStyle !== style.id) { e.currentTarget.style.borderColor = T.border; e.currentTarget.style.color = T.muted; } }}
                                             >
-                                                {React.cloneElement(style.icon, { className: "w-5 h-5" })}
-                                                {style.label}
+                                                {React.cloneElement(style.icon, { className: "w-4 h-4 md:w-5 md:h-5" })}
+                                                <span className="truncate w-full text-center px-1">{style.label}</span>
                                             </button>
                                         ))}
                                     </div>
@@ -527,13 +528,13 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
                         {/* OUTPUT */}
                         <div className="flex flex-col gap-6">
-                            <div className="flex-grow rounded-3xl p-8 border flex flex-col min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
-                                <div className="flex items-center justify-between mb-6">
+                            <div className="flex-grow rounded-3xl p-5 md:p-8 border flex flex-col min-h-[400px] md:min-h-[420px]" style={{ background: "white", borderColor: T.border }}>
+                                <div className="flex items-center justify-between mb-4 md:mb-6">
                                     <div className="flex items-center gap-2.5">
-                                        <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
-                                            <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
+                                        <div className="w-8 h-8 md:w-9 md:h-9 rounded-xl flex items-center justify-center" style={{ background: `rgba(196,149,106,0.12)` }}>
+                                            <Sparkles className="w-4 h-4 md:w-5 md:h-5" style={{ color: T.accent }} />
                                         </div>
-                                        <p className="font-black" style={{ color: T.dark }}>AI Output</p>
+                                        <p className="font-black text-sm md:text-base" style={{ color: T.dark }}>AI Output</p>
                                     </div>
                                     {caption && (
                                         <div className="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest" style={{ background: "rgba(52,211,153,0.1)", color: "#059669", border: "1px solid rgba(52,211,153,0.2)" }}>Ready</div>

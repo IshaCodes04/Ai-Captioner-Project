@@ -13,6 +13,7 @@ const T = {
 const Home = () => {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -45,8 +46,8 @@ const Home = () => {
     <div className="min-h-screen text-[#1a1a1a] overflow-x-hidden bg-[#fafafa]" style={{ fontFamily: "'Manrope', sans-serif" }}>
 
       {/* ══ NAVBAR ══════════════════════════════════════════════ */}
-      <nav className={`fixed top-0 left-0 w-full z-[120] transition-all duration-500 ${scrolled ? "py-4 bg-white/95 backdrop-blur-xl shadow-sm" : "py-5 bg-transparent"}`}>
-        <div className="max-w-7xl mx-auto px-8 flex justify-between items-center text-[#1a1a1a]">
+      <nav className={`fixed top-0 left-0 w-full z-[120] transition-all duration-500 ${scrolled ? "py-3 bg-white/95 backdrop-blur-xl shadow-sm" : "py-5 bg-transparent"}`}>
+        <div className="max-w-7xl mx-auto px-6 md:px-8 flex justify-between items-center text-[#1a1a1a]">
           <div className="flex items-center gap-12">
             <div className="cursor-pointer transition-transform hover:scale-105 active:scale-95" onClick={() => navigate("/home")}>
               <Logo />
@@ -59,7 +60,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-5">
+          <div className="hidden md:flex items-center gap-5">
             <button 
               onClick={() => navigate("/login")}
               className="px-6 py-2.5 rounded-xl font-bold text-[12px] uppercase tracking-wider hover:bg-[#1a1a1a] hover:text-white transition-all border border-[#e8e0d5]"
@@ -74,8 +75,56 @@ const Home = () => {
               Sign Up Free
             </button>
           </div>
+
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <div className={`w-6 h-0.5 bg-black transition-all ${mobileMenuOpen ? "rotate-45 translate-y-2" : ""}`}></div>
+            <div className={`w-6 h-0.5 bg-black transition-all ${mobileMenuOpen ? "opacity-0" : ""}`}></div>
+            <div className={`w-6 h-0.5 bg-black transition-all ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`}></div>
+          </button>
         </div>
       </nav>
+
+      {/* Mobile Menu Overlay - Move outside to avoid stacking context issues */}
+      <div className={`fixed inset-0 z-[300] transition-all duration-500 md:hidden flex flex-col items-center justify-center gap-8 px-8 text-center ${mobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}`}>
+        <div className="absolute inset-0 bg-white/95 backdrop-blur-2xl -z-10"></div>
+        
+        <button className="absolute top-8 right-8 w-12 h-12 flex items-center justify-center bg-[#f5f0eb] rounded-2xl" onClick={() => setMobileMenuOpen(false)}>
+          <Logo textVisible={false} size={30} />
+        </button>
+
+        <div className="flex flex-col gap-6 w-full">
+          {[["Features", "#features"], ["How It Works", "#how"], ["Pricing", "#pricing"]].map(([l, h]) => (
+            <a 
+              key={l} 
+              href={h} 
+              onClick={() => setMobileMenuOpen(false)}
+              className="text-4xl font-black tracking-tighter hover:text-[#c4956a] transition-colors"
+            >{l}</a>
+          ))}
+        </div>
+
+        <div className="w-full h-px bg-[#e8e0d5] my-4"></div>
+
+        <div className="flex flex-col gap-4 w-full">
+          <button 
+            onClick={() => { navigate("/login"); setMobileMenuOpen(false); }}
+            className="w-full py-5 rounded-2xl font-black text-xl uppercase tracking-widest border-2 border-[#e8e0d5] bg-white text-[#1a1a1a]"
+          >
+            Login
+          </button>
+          <button 
+            onClick={() => { navigate("/signup"); setMobileMenuOpen(false); }}
+            className="w-full py-5 rounded-2xl font-black text-xl uppercase tracking-widest text-white shadow-xl shadow-[#c4956a]/20"
+            style={{ background: T.accent }}
+          >
+            Sign Up Free
+          </button>
+        </div>
+      </div>
 
       {/* ══ HERO ════════════════════════════════════════════════ */}
       <section className="relative pt-40 pb-20 px-8 overflow-hidden bg-[#fafafa]">
@@ -91,7 +140,7 @@ const Home = () => {
               Next-Gen Vision AI
             </div>
 
-            <h1 className="text-[72px] md:text-[88px] font-extrabold leading-[0.9] tracking-[-0.05em] mb-10" style={{ color: T.dark, fontFamily: "'Urbanist', sans-serif" }}>
+            <h1 className="text-[52px] md:text-[88px] font-extrabold leading-[0.9] tracking-[-0.05em] mb-10" style={{ color: T.dark, fontFamily: "'Urbanist', sans-serif" }}>
               Turn Any Image<br />
               <span className="relative inline-block group">
                 Into a <span style={{ color: T.accent }}>Viral Script</span>
@@ -100,12 +149,12 @@ const Home = () => {
               </span>
             </h1>
 
-            <div className="relative pl-10 mb-12 max-w-xl group">
+            <div className="relative pl-6 md:pl-10 mb-12 max-w-xl group">
               {/* Stylish Designer Line */}
               <div className="absolute left-0 top-0 h-full w-[2px] bg-gradient-to-b from-[#c4956a] via-[#c4956a]/40 to-transparent">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full bg-[#c4956a] shadow-[0_0_15px_#c4956a] animate-pulse"></div>
               </div>
-              <p className="text-xl md:text-[22px] font-medium leading-[1.6] group-hover:translate-x-1 transition-transform duration-500" style={{ color: T.mid }}>
+              <p className="text-lg md:text-[22px] font-medium leading-[1.6] group-hover:translate-x-1 transition-transform duration-500" style={{ color: T.mid }}>
                 The world's most <span className="font-extrabold" style={{ color: T.dark }}>intelligent vision engine</span> for creators. Generate captions that <span className="italic font-bold" style={{ color: T.accent }}>stop the scroll</span>.
               </p>
             </div>
@@ -254,12 +303,12 @@ const Home = () => {
         <div className="max-w-7xl mx-auto relative">
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f5f0eb] rounded-full blur-[120px] opacity-30 -z-10"></div>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-24">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16 md:mb-24">
             <div className="space-y-6">
               <div className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] bg-[#1a1a1a] text-white">The Toolkit</div>
-              <h2 className="text-[64px] font-black leading-[0.95] tracking-tight text-[#1a1a1a]">Everything creators<br />actually need.</h2>
+              <h2 className="text-[42px] md:text-[64px] font-black leading-[0.95] tracking-tight text-[#1a1a1a]">Everything creators<br />actually need.</h2>
             </div>
-            <p className="text-lg font-medium opacity-50 max-w-sm mb-4">No fluff. Just the most powerful AI primitives for digital distribution.</p>
+            <p className="text-base md:text-lg font-medium opacity-50 max-w-sm mb-4">No fluff. Just the most powerful AI primitives for digital distribution.</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -315,13 +364,13 @@ const Home = () => {
       {/* ══ PRICING (UNLIMITED) ══════════════════════════════════ */}
       <section id="pricing" className="py-32 px-8 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="rounded-[64px] p-24 text-center relative overflow-hidden bg-[#1a1a1a] text-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+          <div className="rounded-[40px] md:rounded-[64px] p-10 md:p-24 text-center relative overflow-hidden bg-[#1a1a1a] text-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: `radial-gradient(circle at 100% 0%, ${T.accent} 0%, transparent 50%), radial-gradient(circle at 0% 100%, ${T.accent} 0%, transparent 50%)` }}></div>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none opacity-[0.03]" style={{ backgroundImage: `radial-gradient(white 1px, transparent 1px)`, backgroundSize: '24px 24px' }}></div>
 
             <div className="relative z-10">
               <p className="text-xs font-black uppercase tracking-[0.4em] mb-10" style={{ color: T.accent }}>Pricing Simplified</p>
-              <h2 className="text-[72px] font-black leading-[0.9] mb-10 tracking-tight">
+              <h2 className="text-[42px] md:text-[72px] font-black leading-[0.9] mb-10 tracking-tight">
                 Unlimited for <br /> everyone, <span style={{ color: T.accent }}>forever.</span>
               </h2>
               <div className="flex flex-wrap justify-center gap-10 mb-16 opacity-40">
