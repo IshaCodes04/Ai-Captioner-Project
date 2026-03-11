@@ -72,49 +72,26 @@ const TONE_CONFIG = {
   },
 };
 
-async function generateCaptions(base64ImageFile, tone = "casual", mimeType = "image/jpeg") {
+async function generateCaptions(base64ImageFile, tone = "casual") {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not defined in environment variables.");
-    }
-
-    // Re-initialize to ensure fresh ENV pick-up
-    const genAI = new GoogleGenAI(apiKey);
     const config = TONE_CONFIG[tone] || TONE_CONFIG.casual;
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    // Build the parts array accurately
-    const prompt = `${config.systemInstruction}\n\nTask: ${config.userPrompt}`;
-    
     const result = await model.generateContent([
-      { text: prompt },
+      { text: config.systemInstruction + "\n\n" + config.userPrompt },
       {
         inlineData: {
-          mimeType: mimeType,
+          mimeType: "image/jpeg",
           data: base64ImageFile
         }
       }
     ]);
 
-    const response = await result.response;
-    const captionText = response.text();
-    
-    if (!captionText) {
-      throw new Error("AI returned an empty response.");
-    }
-
-    console.log("✅ AI Response successful");
-    return captionText;
+    return result.response.text();
 
   } catch (error) {
-    console.error("❌ Gemini Service Error:", error.message);
-    // Specific error handling for more clarity
-    if (error.message.includes("403")) throw new Error("API Key is invalid or restricted.");
-    if (error.message.includes("429")) throw new Error("Rate limit exceeded. Try again later.");
-    if (error.message.includes("location")) throw new Error("Gemini is not available in your server's region.");
-    
-    throw new Error("AI Error: " + error.message);
+    console.error("AI Generation Error:", error);
+    throw new Error("Failed to generate caption: " + error.message);
   }
 }
 

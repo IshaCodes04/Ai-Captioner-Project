@@ -17,26 +17,12 @@ async function createPostController(req, res) {
 
     const base64Image = Buffer.from(file.buffer).toString("base64");
 
-    // Run AI Generation and Image Upload in PARALLEL to save time
-    console.log("⚡ Starting AI generation and Image upload in parallel...");
+    // Pehle jaisa Simple sequential execution
+    console.log("Generating caption with AI...");
+    const caption = await generateCaptions(base64Image, tone);
     
-    let caption, uploadResult;
-    try {
-      [caption, uploadResult] = await Promise.all([
-        generateCaptions(base64Image, tone, file.mimetype).catch(err => { 
-          console.error("❌ AI Error:", err.message);
-          throw new Error("AI_FAILED: " + err.message); 
-        }),
-        uploadFile(file.buffer, `${uuidv4()}`).catch(err => { 
-          console.error("❌ Upload Error:", err.message);
-          throw new Error("UPLOAD_FAILED: " + err.message); 
-        })
-      ]);
-    } catch (parallelError) {
-      throw parallelError; // caught by outer catch
-    }
-
-    console.log("✅ AI & Upload completed!");
+    console.log("Uploading to ImageKit...");
+    const uploadResult = await uploadFile(file.buffer, `${uuidv4()}`);
 
     console.log("Saving to DB...");
     const post = await postModel.create({
@@ -45,29 +31,15 @@ async function createPostController(req, res) {
       tone: tone,
       user: req.user._id,
     });
-    console.log("Post saved to DB.");
 
     res.status(201).json({
       message: "Post Created Successfully",
       post,
     });
   } catch (error) {
-    console.error("Detailed Error in createPostController:", error);
-    
-    // Log to file for persistent debugging
-    const fs = require('fs');
-    const logMsg = `\n[${new Date().toISOString()}] Error: ${error.message}\n`;
-    fs.appendFileSync('error_debug.log', logMsg);
-
-    let userMessage = "Error creating post";
-    if (error.message.includes("AI_FAILED")) {
-      userMessage = "AI Generation failed. Please check your Gemini API key or image format.";
-    } else if (error.message.includes("UPLOAD_FAILED")) {
-      userMessage = "Image upload failed. Please check your ImageKit credentials.";
-    }
-
+    console.error("Error creating post:", error);
     res.status(500).json({
-      message: userMessage,
+      message: "Error creating post",
       error: error.message,
     });
   }
