@@ -7,6 +7,9 @@ async function createPostController(req, res) {
   try {
     const file = req.file;
 
+    console.log("--- START POST CREATION ---");
+    console.log("Authenticated User ID:", req.user ? req.user._id : "NULL (Unauthorized)");
+    
     if (!file) {
       return res.status(400).json({ message: "No image file provided" });
     }

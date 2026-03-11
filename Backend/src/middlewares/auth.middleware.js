@@ -12,10 +12,13 @@ async function authMiddleware(req, res, next) {
     }
 
     // Verify token
+    console.log("   --- [AUTH] Verifying Token...");
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("   --- [AUTH] Decoded ID:", decoded.id);
 
     // Find user
     const user = await userModel.findById(decoded.id);
+    console.log("   --- [AUTH] User search result:", user ? "USER FOUND" : "USER NOT FOUND");
 
     if (!user) {
       return res.status(401).json({
