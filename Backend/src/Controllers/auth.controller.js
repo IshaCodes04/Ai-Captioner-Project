@@ -61,6 +61,15 @@ async function registerController(req, res) {
 
   } catch (error) {
     console.error("Register error:", error);
+    
+    // Check for MongoDB Duplicate Key Error
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      return res.status(400).json({
+        message: `This ${field} is already registered. Please use another one.`
+      });
+    }
+
     return res.status(500).json({
       message: "Error registering user",
       error: error.message

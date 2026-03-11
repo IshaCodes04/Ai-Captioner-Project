@@ -17,19 +17,20 @@ async function createPostController(req, res) {
 
     const base64Image = Buffer.from(file.buffer).toString("base64");
 
-    // Pass tone to AI service
-    console.log("Generating caption with AI...");
-    const caption = await generateCaptions(base64Image, tone);
-    console.log("AI Caption generated:", caption.substring(0, 30) + "...");
+    // Run AI Generation and Image Upload in PARALLEL to save time
+    console.log("⚡ Starting AI generation and Image upload in parallel...");
+    
+    const [caption, uploadResult] = await Promise.all([
+      generateCaptions(base64Image, tone),
+      uploadFile(file.buffer, `${uuidv4()}`)
+    ]);
 
-    console.log("Uploading to ImageKit...");
-    const result = await uploadFile(file.buffer, `${uuidv4()}`);
-    console.log("Image uploaded to:", result.url);
+    console.log("✅ AI & Upload completed!");
 
     console.log("Saving to DB...");
     const post = await postModel.create({
       caption: caption,
-      image: result.url,
+      image: uploadResult.url,
       tone: tone,
       user: req.user._id,
     });

@@ -20,6 +20,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true
+  },
+  username: {
+    type: String,
+    sparse: true,
+    unique: true
   }
 })
 
