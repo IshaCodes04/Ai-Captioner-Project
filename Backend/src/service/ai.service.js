@@ -32,8 +32,8 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Gemma 3 27B IT is free and supports image+text for captions
-        model: "google/gemma-3-27b-it:free",
+        // Using 12B instead of 27B to avoid upstream rate limits
+        model: "google/gemma-3-12b-it:free",
         messages: [
           {
             role: "user",
