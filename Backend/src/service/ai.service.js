@@ -32,8 +32,8 @@ async function generateCaptions(base64ImageFile, tone = "casual") {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // Llama 3.2 90B Vision Instruct is free and excellent for images + text
-        model: "meta-llama/llama-3.2-90b-vision-instruct:free",
+        // Gemma 3 27B IT is free and supports image+text for captions
+        model: "google/gemma-3-27b-it:free",
         messages: [
           {
             role: "user",
