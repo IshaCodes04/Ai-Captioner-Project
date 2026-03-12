@@ -1,4 +1,3 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 require("dotenv").config();
 
 const TONE_CONFIG = {
@@ -10,29 +9,60 @@ const TONE_CONFIG = {
 };
 
 async function generateCaptions(base64ImageFile, tone = "casual") {
-  console.log("   [AI] Starting generateCaptions function...");
+  console.log("   [AI] Starting generateCaptions function using OpenRouter...");
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) throw new Error("API Key Missing");
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) throw new Error("OPENROUTER_API_KEY is missing in .env file");
 
     const instruction = TONE_CONFIG[tone] || TONE_CONFIG.casual;
     const fullPrompt = `${instruction}\n\nFormat your response as a list with bullet points.`;
 
-    console.log("   [AI] Requesting Gemini API...");
-    const result = await model.generateContent([
-      fullPrompt,
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64ImageFile
-        }
-      }
-    ]);
+    console.log("   [AI] Requesting OpenRouter API...");
+    
+    // Fixing base64 URL format for OpenRouter
+    let imageUrl = base64ImageFile;
+    if (!imageUrl.startsWith("data:")) {
+      imageUrl = `data:image/jpeg;base64,${base64ImageFile}`;
+    }
 
-    const text = result.response.text();
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        // Llama 3.2 90B Vision Instruct is free and excellent for images + text
+        model: "meta-llama/llama-3.2-90b-vision-instruct:free",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: fullPrompt
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: imageUrl
+                }
+              }
+            ]
+          }
+        ]
+      })
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("   [AI] OpenRouter error:", errorText);
+      throw new Error(`OpenRouter API responded with status ${response.status}: ${errorText}`);
+    }
+
+    const json = await response.json();
+    const text = json.choices[0].message.content;
+    
     console.log("   [AI] Response received successfully!");
     return text;
   } catch (error) {
