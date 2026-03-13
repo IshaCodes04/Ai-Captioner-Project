@@ -15,6 +15,11 @@ const Home = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  };
+
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [isProcessing, setIsProcessing] = useState(false);
   const [showResult, setShowResult] = useState(false);
@@ -54,8 +59,8 @@ const Home = () => {
             </div>
 
             <div className="hidden lg:flex items-center gap-10">
-              {[["Features", "/features"], ["How It Works", "/how"], ["Pricing", "/pricing"]].map(([l, p]) => (
-                <button key={l} onClick={() => navigate(p)} className="text-[12px] font-bold uppercase tracking-[0.25em] transition-all hover:text-[#c4956a]">{l}</button>
+              {[["Features", "features"], ["How It Works", "how-it-works"], ["Pricing", "pricing"]].map(([l, id]) => (
+                <button key={l} onClick={() => scrollToSection(id)} className="text-[12px] font-bold uppercase tracking-[0.25em] transition-all hover:text-[#c4956a]">{l}</button>
               ))}
             </div>
           </div>
@@ -97,10 +102,10 @@ const Home = () => {
         </button>
 
         <div className="flex flex-col gap-6 w-full">
-          {[["Features", "/features"], ["How It Works", "/how"], ["Pricing", "/pricing"]].map(([l, p]) => (
+          {[["Features", "features"], ["How It Works", "how-it-works"], ["Pricing", "pricing"]].map(([l, id]) => (
             <button 
               key={l} 
-              onClick={() => { navigate(p); setMobileMenuOpen(false); }}
+              onClick={() => { scrollToSection(id); setMobileMenuOpen(false); }}
               className="text-4xl font-black tracking-tighter hover:text-[#c4956a] transition-colors"
             >{l}</button>
           ))}
@@ -264,6 +269,92 @@ const Home = () => {
                   <p className="text-base font-black text-[#1a1a1a]">0.28s <span className="text-xs opacity-50">⚡</span></p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══ FEATURES ══════════════════════════════════════════════ */}
+      <section id="features" className="pt-32 pb-24 px-8 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto relative">
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[#f5f0eb] rounded-full blur-[120px] opacity-30 -z-10"></div>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-16 md:mb-24 text-center lg:text-left">
+            <div className="space-y-6">
+              <div className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] bg-[#1a1a1a] text-white">The Toolkit</div>
+              <h2 className="text-[42px] md:text-[64px] font-black leading-[0.95] tracking-tight text-[#1a1a1a]">Everything creators<br />actually need.</h2>
+            </div>
+            <p className="text-base md:text-lg font-medium opacity-50 max-w-sm mx-auto lg:mx-0">No fluff. Just the most powerful AI primitives for digital distribution.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { icon: <Wand2 />, title: "Vision Analysis", desc: "Reads objects, mood, and context with sub-pixel precision." },
+              { icon: <Sparkles />, title: "Style Overlays", desc: "Switch between 5+ professional tones with a single click." },
+              { icon: <Globe />, title: "Global Reach", desc: "Native support for Hindi, Hinglish, Spanish and beyond." },
+              { icon: <Shield />, title: "Encrypted Cloud", desc: "Your images are processed in a secure sandbox & never stored." },
+              { icon: <Zap />, title: "Millisecond Sync", desc: "Powered by Gemini 1.5 Flash for near-instant execution." },
+              { icon: <Copy />, title: "Multi-Platform Export", desc: "Optimized formatting for Instagram, X, and LinkedIn." }
+            ].map((f, i) => (
+              <div key={i} className="group p-10 rounded-[40px] border border-[#e8e0d5] bg-white transition-all hover:border-[#1a1a1a] hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] hover:-translate-y-2">
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-10 transition-all group-hover:scale-110 group-hover:rotate-3 shadow-lg bg-[#1a1a1a] text-white">
+                  {React.cloneElement(f.icon, { className: "w-8 h-8" })}
+                </div>
+                <h3 className="text-2xl font-black mb-4">{f.title}</h3>
+                <p className="font-medium text-[15px] opacity-40 leading-relaxed group-hover:opacity-100 transition-opacity">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ HOW IT WORKS ══════════════════════════════════════════════ */}
+      <section id="how-it-works" className="pt-32 pb-24 px-8 relative overflow-hidden" style={{ background: T.surface }}>
+        <div className="absolute top-1/2 left-0 w-full h-px border-t border-dashed border-[#d8d0c5] -translate-y-1/2 hidden md:block"></div>
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-32">
+            <div className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] bg-white border border-[#e8e0d5] text-[#c4956a] mb-6">The Process</div>
+            <h2 className="text-[42px] md:text-[64px] font-black tracking-tight leading-none">3 Steps to Virality</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-16 lg:gap-24">
+            {[
+              { step: "01", icon: <Upload />, title: "Upload", desc: "Select any visual asset from your device." },
+              { step: "02", icon: <Wand2 />, title: "Analyze", desc: "Gemini Vision reads the context & mood." },
+              { step: "03", icon: <Copy />, title: "Deploy", desc: "Copy & post with one-click formatting." }
+            ].map((s, i) => (
+              <div key={i} className="relative group text-center md:text-left">
+                <div className="w-24 h-24 rounded-[32px] bg-white border border-[#e8e0d5] shadow-[0_20px_40px_-10px_rgba(0,0,0,0.05)] flex items-center justify-center text-[#1a1a1a] mb-10 transition-all group-hover:scale-110 group-hover:-rotate-3 relative z-10 mx-auto md:mx-0">
+                  <div className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-[#1a1a1a] text-white text-[10px] font-black flex items-center justify-center border-4 border-[#f5f0eb]">{s.step}</div>
+                  {React.cloneElement(s.icon, { className: "w-10 h-10" })}
+                </div>
+                <h3 className="text-3xl font-black mb-4">{s.title}</h3>
+                <p className="font-medium text-[#4a4a4a] opacity-50 text-lg leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══ PRICING ══════════════════════════════════════════════ */}
+      <section id="pricing" className="pt-32 pb-32 px-8 bg-white min-h-[80vh] flex items-center">
+        <div className="max-w-6xl mx-auto w-full">
+          <div className="rounded-[40px] md:rounded-[64px] p-10 md:p-24 text-center relative overflow-hidden bg-[#1a1a1a] text-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.3)]">
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ background: `radial-gradient(circle at 100% 0%, ${T.accent} 0%, transparent 50%), radial-gradient(circle at 0% 100%, ${T.accent} 0%, transparent 50%)` }}></div>
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full pointer-events-none opacity-[0.03]" style={{ backgroundImage: `radial-gradient(white 1px, transparent 1px)`, backgroundSize: '24px 24px' }}></div>
+            <div className="relative z-10">
+              <p className="text-xs font-black uppercase tracking-[0.4em] mb-10" style={{ color: T.accent }}>Pricing Simplified</p>
+              <h2 className="text-[42px] md:text-[72px] font-black leading-[0.9] mb-10 tracking-tight">
+                Unlimited for <br /> everyone, <span style={{ color: T.accent }}>forever.</span>
+              </h2>
+              <div className="flex flex-wrap justify-center gap-10 mb-16 opacity-40">
+                {["No Credit Card", "Unlimited Generations", "All Style Tones", "Privacy Guaranteed"].map(feat => (
+                  <div key={feat} className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    {feat}
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => navigate("/signup")} className="px-12 py-5 rounded-2xl font-black text-xl bg-white text-black hover:scale-105 transition-all">Get Started Now</button>
             </div>
           </div>
         </div>

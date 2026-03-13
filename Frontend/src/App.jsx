@@ -5,9 +5,6 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
 import ImageCaptioner from "./pages/ImageCaptioner";
-import Features from "./pages/Features";
-import HowItWorks from "./pages/HowItWorks";
-import Pricing from "./pages/Pricing";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -137,10 +134,6 @@ const App = () => {
           )
         }
       />
-
-      <Route path="/features" element={<Features />} />
-      <Route path="/how" element={<HowItWorks />} />
-      <Route path="/pricing" element={<Pricing />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/home" replace />} />
