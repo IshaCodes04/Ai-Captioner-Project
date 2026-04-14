@@ -526,15 +526,49 @@ const ImageCaptioner = ({ onLogout, user }) => {
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b pb-8" style={{ borderColor: T.border }}>
                     <div className="text-center md:text-left">
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-3" style={{ color: T.dark }}>
-                            {activeTab === "editor" ? (
-                                <>Captions by <span style={{ color: T.accent }}>Image</span></>
-                            ) : (
-                                <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
+                        <div className="flex flex-col md:flex-row md:items-center gap-4 mb-3">
+                            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight" style={{ color: T.dark }}>
+                                {activeTab === "editor" ? (
+                                    <>Captions by <span style={{ color: T.accent }}>Image</span></>
+                                ) : (
+                                    <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
+                                )}
+                            </h1>
+                            
+                            {activeTab === "gallery" && (
+                                <div className="flex items-center justify-center gap-2">
+                                    {isSelectionMode ? (
+                                        <>
+                                            <button
+                                                onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }}
+                                                className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all bg-white hover:bg-gray-100"
+                                                style={{ borderColor: T.border, color: T.mid }}
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={handleBulkDelete}
+                                                disabled={selectedIds.length === 0}
+                                                className="px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 disabled:opacity-50"
+                                                style={{ background: "#ef4444" }}
+                                            >
+                                                Delete ({selectedIds.length})
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <button
+                                            onClick={() => { setIsSelectionMode(true); setSelectedIds([]); }}
+                                            className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all bg-black text-white hover:bg-[#c4956a] group"
+                                        >
+                                            <Trash2 className="w-3 h-3 text-red-500" />
+                                            Select & Delete
+                                        </button>
+                                    )}
+                                </div>
                             )}
-                        </h1>
+                        </div>
                         <p className="font-medium text-xs sm:text-sm md:text-base px-2 md:px-0" style={{ color: T.muted }}>
                             {activeTab === "editor"
                                 ? "Upload image → AI reads scene → Get captions"
@@ -542,39 +576,6 @@ const ImageCaptioner = ({ onLogout, user }) => {
                             }
                         </p>
                     </div>
-
-                    {activeTab === "gallery" && (
-                        <div className="flex items-center justify-center md:justify-end gap-3">
-                            {isSelectionMode ? (
-                                <>
-                                    <button
-                                        onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }}
-                                        className="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border transition-all hover:bg-gray-100"
-                                        style={{ borderColor: T.border, color: T.mid }}
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={handleBulkDelete}
-                                        disabled={selectedIds.length === 0}
-                                        className="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100"
-                                        style={{ background: "#ef4444" }}
-                                    >
-                                        Delete Selected ({selectedIds.length})
-                                    </button>
-                                </>
-                            ) : (
-                                <button
-                                    onClick={() => { setIsSelectionMode(true); setSelectedIds([]); }}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border transition-all hover:bg-gray-50 group"
-                                    style={{ borderColor: T.border, color: T.dark }}
-                                >
-                                    <Trash2 className="w-3.5 h-3.5 text-red-500 group-hover:scale-110 transition-transform" />
-                                    Select & Delete
-                                </button>
-                            )}
-                        </div>
-                    )}
                 </div>
 
                 {activeTab === "gallery" ? (
