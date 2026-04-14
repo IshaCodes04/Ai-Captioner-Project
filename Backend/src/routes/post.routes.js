@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router()
 const authMiddleware = require("../middlewares/auth.middleware");
-const { createPostController, getUserPostsController } = require("../Controllers/post.controller")
+const { createPostController, getUserPostsController, deletePostController, bulkDeletePostsController } = require("../Controllers/post.controller")
 const multer = require("multer");
 
 
@@ -26,11 +26,14 @@ router.get('/', authMiddleware, getUserPostsController);
 
 // POST /api/posts [protected] {image-file}
 router.post('/',
-  authMiddleware, // if req is authorized then req.user = userData set kr dega simple or next se req forward ho jyegi
+  authMiddleware, 
   upload.single("image"),
   createPostController)
 
+// DELETE /api/posts/bulk [protected]
+router.delete('/bulk', authMiddleware, bulkDeletePostsController);
 
-
+// DELETE /api/posts/:id [protected]
+router.delete('/:id', authMiddleware, deletePostController);
 
 module.exports = router;

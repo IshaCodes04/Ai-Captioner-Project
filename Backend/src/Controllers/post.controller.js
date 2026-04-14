@@ -50,4 +50,37 @@ async function getUserPostsController(req, res) {
   }
 }
 
-module.exports = { createPostController, getUserPostsController };
+async function deletePostController(req, res) {
+  try {
+    const { id } = req.params;
+    const post = await postModel.findOneAndDelete({ _id: id, user: req.user._id });
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found or unauthorized" });
+    }
+
+    res.status(200).json({ message: "Post deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting post", error: error.message });
+  }
+}
+
+async function bulkDeletePostsController(req, res) {
+  try {
+    const { ids } = req.body;
+    if (!ids || !Array.isArray(ids)) {
+      return res.status(400).json({ message: "Invalid post IDs provided" });
+    }
+
+    await postModel.deleteMany({
+      _id: { $in: ids },
+      user: req.user._id
+    });
+
+    res.status(200).json({ message: "Posts deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting posts", error: error.message });
+  }
+}
+
+module.exports = { createPostController, getUserPostsController, deletePostController, bulkDeletePostsController };

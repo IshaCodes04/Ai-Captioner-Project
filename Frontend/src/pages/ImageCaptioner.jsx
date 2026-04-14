@@ -164,15 +164,28 @@ const CaptionOutput = ({ caption, T, onRegenerateClick }) => {
 };
 
 // ─── Gallery View ─────────────────────────────────────────────────────
-const GalleryView = ({ history, T, onSelect }) => {
+const GalleryView = ({ history, T, onSelect, onDelete, isSelectionMode, selectedIds, onToggleSelect }) => {
     return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
             {history.map((item) => (
                 <div
                     key={item.id}
-                    onClick={() => onSelect(item)}
-                    className="group relative bg-white rounded-[32px] border border-[#e8e0d5] overflow-hidden cursor-pointer hover:shadow-2xl hover:-translate-y-1 transition-all"
+                    onClick={() => isSelectionMode ? onToggleSelect(item.id) : onSelect(item)}
+                    className={`group relative bg-white rounded-[32px] border overflow-hidden cursor-pointer transition-all ${isSelectionMode
+                            ? selectedIds.includes(item.id)
+                                ? "border-[#c4956a] scale-[0.98] shadow-inner"
+                                : "border-[#e8e0d5] opacity-70"
+                            : "border-[#e8e0d5] hover:shadow-2xl hover:-translate-y-1"
+                        }`}
                 >
+                    {/* Selection Indicator */}
+                    {isSelectionMode && (
+                        <div className={`absolute top-5 right-5 z-20 w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all ${selectedIds.includes(item.id) ? "bg-[#c4956a] border-[#c4956a]" : "bg-white/50 border-white"
+                            }`}>
+                            {selectedIds.includes(item.id) && <CheckCircle2 className="w-5 h-5 text-white" />}
+                        </div>
+                    )}
+
                     <div className="aspect-[4/3] w-full overflow-hidden">
                         <img
                             src={item.image}
@@ -193,11 +206,30 @@ const GalleryView = ({ history, T, onSelect }) => {
                             "{item.caption}"
                         </p>
                     </div>
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                        <div className="bg-white/90 p-4 rounded-2xl scale-90 group-hover:scale-100 transition-transform">
-                            <Sparkles className="w-6 h-6" style={{ color: T.accent }} />
+
+                    {/* Hover Overlay with Actions - Only show when NOT in selection mode */}
+                    {!isSelectionMode && (
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-4 backdrop-blur-[3px]">
+                            <div className="flex items-center gap-3">
+                                <div className="bg-white p-3 rounded-2xl scale-90 group-hover:scale-100 transition-all hover:bg-[#fafafa]">
+                                    <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
+                                </div>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (window.confirm("Do you want to delete this AI memory forever?")) {
+                                            onDelete(item.id);
+                                        }
+                                    }}
+                                    className="bg-red-500 p-3 rounded-2xl scale-90 group-hover:scale-100 transition-all hover:bg-red-600 shadow-xl text-white"
+                                    title="Delete from history"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] opacity-80">Click to view or delete</p>
                         </div>
-                    </div>
+                    )}
                 </div>
             ))}
         </div>
@@ -217,6 +249,8 @@ const ImageCaptioner = ({ onLogout, user }) => {
     const [showHistory, setShowHistory] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [activeTab, setActiveTab] = useState("editor"); // 'editor' or 'gallery'
+    const [isSelectionMode, setIsSelectionMode] = useState(false);
+    const [selectedIds, setSelectedIds] = useState([]);
     const fileInputRef = useRef(null);
     const uploadedFileRef = useRef(null); // store last uploaded file for regeneration
 
@@ -357,6 +391,40 @@ const ImageCaptioner = ({ onLogout, user }) => {
         } finally { setIsGenerating(false); }
     };
 
+    const handleDeletePost = async (postId) => {
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/posts/${postId}`, { withCredentials: true });
+            setCaptionHistory(prev => prev.filter(item => item.id !== postId));
+            showToast("Post deleted successfully", "success");
+        } catch (err) {
+            console.error("Delete error:", err);
+            showToast("Failed to delete post", "error");
+        }
+    };
+
+    const handleBulkDelete = async () => {
+        if (selectedIds.length === 0) return;
+        if (!window.confirm(`Delete ${selectedIds.length} selected items?`)) return;
+
+        try {
+            await axios.delete(`${import.meta.env.VITE_API_URL}/api/posts/bulk`, {
+                data: { ids: selectedIds },
+                withCredentials: true
+            });
+            setCaptionHistory(prev => prev.filter(item => !selectedIds.includes(item.id)));
+            setSelectedIds([]);
+            setIsSelectionMode(false);
+            showToast("Selection deleted successfully", "success");
+        } catch (err) {
+            console.error("Bulk delete error:", err);
+            showToast("Failed to delete selection", "error");
+        }
+    };
+
+    const toggleIdSelection = (id) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
+    };
+
     return (
         <div className="min-h-screen" style={{ background: T.bg, fontFamily: "'Outfit', sans-serif", color: T.dark }}>
 
@@ -458,26 +526,65 @@ const ImageCaptioner = ({ onLogout, user }) => {
             </nav>
 
             <main className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-                <div className="mb-8 md:mb-12 text-center md:text-left">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-3" style={{ color: T.dark }}>
-                        {activeTab === "editor" ? (
-                            <>Captions by <span style={{ color: T.accent }}>Image</span></>
-                        ) : (
-                            <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
-                        )}
-                    </h1>
-                    <p className="font-medium text-xs sm:text-sm md:text-base px-2 md:px-0" style={{ color: T.muted }}>
-                        {activeTab === "editor"
-                            ? "Upload image → AI reads scene → Get captions"
-                            : "Explore your collection of AI-generated stories and visuals"
-                        }
-                    </p>
+                <div className="mb-8 md:mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="text-center md:text-left">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight mb-3" style={{ color: T.dark }}>
+                            {activeTab === "editor" ? (
+                                <>Captions by <span style={{ color: T.accent }}>Image</span></>
+                            ) : (
+                                <>Your AI <span style={{ color: T.accent }}>Gallery</span></>
+                            )}
+                        </h1>
+                        <p className="font-medium text-xs sm:text-sm md:text-base px-2 md:px-0" style={{ color: T.muted }}>
+                            {activeTab === "editor"
+                                ? "Upload image → AI reads scene → Get captions"
+                                : "Explore your collection of AI-generated stories and visuals"
+                            }
+                        </p>
+                    </div>
+
+                    {activeTab === "gallery" && (
+                        <div className="flex items-center justify-center md:justify-end gap-3">
+                            {isSelectionMode ? (
+                                <>
+                                    <button
+                                        onClick={() => { setIsSelectionMode(false); setSelectedIds([]); }}
+                                        className="px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border transition-all hover:bg-gray-100"
+                                        style={{ borderColor: T.border, color: T.mid }}
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={handleBulkDelete}
+                                        disabled={selectedIds.length === 0}
+                                        className="px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:grayscale disabled:scale-100"
+                                        style={{ background: "#ef4444" }}
+                                    >
+                                        Delete Selected ({selectedIds.length})
+                                    </button>
+                                </>
+                            ) : (
+                                <button
+                                    onClick={() => { setIsSelectionMode(true); setSelectedIds([]); }}
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest border transition-all hover:bg-gray-50 group"
+                                    style={{ borderColor: T.border, color: T.dark }}
+                                >
+                                    <Trash2 className="w-3.5 h-3.5 text-red-500 group-hover:scale-110 transition-transform" />
+                                    Select & Delete
+                                </button>
+                            )}
+                        </div>
+                    )}
                 </div>
 
                 {activeTab === "gallery" ? (
                     <GalleryView
                         history={captionHistory}
                         T={T}
+                        onDelete={handleDeletePost}
+                        isSelectionMode={isSelectionMode}
+                        selectedIds={selectedIds}
+                        onToggleSelect={toggleIdSelection}
                         onSelect={(item) => {
                             setCaption(item.caption);
                             setPreviewUrl(item.image);
@@ -501,13 +608,9 @@ const ImageCaptioner = ({ onLogout, user }) => {
                                     <div className="relative">
                                         <img src={previewUrl} alt="Preview" className="w-full max-h-[520px] object-cover rounded-[30px]" />
                                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all rounded-[30px] flex items-center justify-center gap-5" style={{ background: "rgba(26,26,26,0.6)", backdropFilter: "blur(4px)" }}>
-                                            <button onClick={(e) => { e.stopPropagation(); setPreviewUrl(null); setCaption(""); if (fileInputRef.current) fileInputRef.current.value = ""; }}
-                                                className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(239,68,68,0.8)" }}>
-                                                <Trash2 className="w-4 h-4" /> Remove
-                                            </button>
                                             <button onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                                                className="flex items-center gap-2 text-white px-5 py-3 rounded-2xl font-bold text-sm active:scale-95 transition-all" style={{ background: "rgba(255,255,255,0.2)" }}>
-                                                <Upload className="w-4 h-4" /> Replace
+                                                className="flex items-center gap-3 text-white px-8 py-4 rounded-2xl font-black text-base active:scale-95 transition-all shadow-2xl" style={{ background: T.accent }}>
+                                                <RefreshCw className="w-5 h-5" /> Replace Image
                                             </button>
                                         </div>
                                     </div>
