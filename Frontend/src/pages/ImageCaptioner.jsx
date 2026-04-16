@@ -214,20 +214,8 @@ const GalleryView = ({ history, T, onSelect, onDelete, isSelectionMode, selected
                                 <div className="bg-white p-3 rounded-2xl scale-90 group-hover:scale-100 transition-all hover:bg-[#fafafa]">
                                     <Sparkles className="w-5 h-5" style={{ color: T.accent }} />
                                 </div>
-                                <button
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (window.confirm("Do you want to delete this AI memory forever?")) {
-                                            onDelete(item.id);
-                                        }
-                                    }}
-                                    className="bg-red-500 p-3 rounded-2xl scale-90 group-hover:scale-100 transition-all hover:bg-red-600 shadow-xl text-white"
-                                    title="Delete from history"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
                             </div>
-                            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] opacity-80">Click to view or delete</p>
+                            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] opacity-80">Click to view</p>
                         </div>
                     )}
                 </div>
@@ -268,6 +256,13 @@ const ImageCaptioner = ({ onLogout, user }) => {
                         timestamp: new Date(p.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                     }));
                     setCaptionHistory(formattedHistory);
+
+                    // Persistence: If refreshing and we have history but no active preview, load latest
+                    if (formattedHistory.length > 0 && !previewUrl && !caption) {
+                        setPreviewUrl(formattedHistory[0].image);
+                        setCaption(formattedHistory[0].caption);
+                        setCaptionStyle(formattedHistory[0].style);
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching history:", err);
@@ -359,6 +354,20 @@ const ImageCaptioner = ({ onLogout, user }) => {
 
     // Regenerate with the selected tone using the same image
     const generateCaption = async () => {
+        // Recovery: If no local file ref (happens on refresh) but we have a preview, try to fetch it
+        if (!uploadedFileRef.current && previewUrl) {
+            try {
+                showToast("Analyzing context for regeneration...");
+                const response = await fetch(previewUrl);
+                const blob = await response.blob();
+                uploadedFileRef.current = new File([blob], "image_repro.jpg", { type: blob.type });
+            } catch (err) {
+                console.error("Image recovery failed:", err);
+                showToast("Please re-upload image to regenerate", "error");
+                return;
+            }
+        }
+
         if (!uploadedFileRef.current) { showToast("Please upload an image first", "error"); return; }
         setIsGenerating(true);
         setCaption("");
